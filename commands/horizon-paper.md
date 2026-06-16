@@ -84,11 +84,23 @@ Keep all of these? Reply with the numbers to DROP (or "all" to keep, "none" to s
 Apply their choice. The final evidence set = base table (Step 2) **+** the additions they kept.
 Confirm the final count before drafting (e.g. "Drafting over 53 papers: 49 base + 4 added").
 
-## Step 5 — Write the paper
-Invoke the **`jel-paper` skill** over the final evidence set. Use `workingQuestion` as the
-north-star and `emphasis` to shape register/length. Obey the citation fence: only cite a
+## Step 5 — Fetch the CURRENT writing contract (so the paper matches the live pipeline)
+The methodology is served by the app and may change between runs — always fetch it fresh:
+```bash
+curl -sS "$HORIZON_API_BASE/api/generation-spec?audience=technical" \
+  -H "Authorization: Bearer $HORIZON_API_TOKEN" -H "x-tenant-id: $HORIZON_TENANT_ID"
+```
+Returns `{ version, audience, spec }`. The `spec` is the **authoritative contract** (citation
+fence, citation-context calibration, framing allowance, CORE/cite-what-matters policy,
+structure, evidence-table footer, voice) — identical to what the server's own drafter uses.
+(Use `audience=policy` if the plan's `emphasis.audience` is `policy`.)
+
+## Step 6 — Write the paper
+Invoke the **`jel-paper` skill** and draft over the final evidence set, **following the fetched
+`spec` exactly** (it overrides the skill's summary if they ever differ). Use `workingQuestion`
+as the north-star and `emphasis` to shape register/length. Obey the citation fence: only cite a
 real `[workId]` from the final set.
 
-## Step 6 — Save
+## Step 7 — Save
 Write the paper to `--out` (default `./horizon-paper-<PLAN_ID>.md`), print the path, and note:
 this ran entirely on the user's Claude subscription — no web-app AI spend.

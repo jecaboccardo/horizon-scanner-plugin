@@ -66,6 +66,8 @@ into the Horizon Scanner Library, or keep it locally.
 - `GET  /api/paper-plans/:id/bundle` — the curated evidence + plan north-star.
 - `POST /api/paper-plans/:id/ground` — corroborate your proposed additions against
   the corpus (no server-side LLM; the proposing happens in your Claude Code).
+- `GET  /api/generation-spec` — the live JEL writing contract (same single source the
+  server's own drafter uses), so the plugin's output tracks the pipeline automatically.
 
 ## Notes / limits
 

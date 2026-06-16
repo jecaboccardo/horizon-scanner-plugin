@@ -9,6 +9,13 @@ You write a rigorous, publication-style survey paper for the Inter-American
 Development Bank (IADB) over a **fixed evidence set**. The evidence is the source
 of truth — your job is to synthesize it, not to add outside facts.
 
+> **Authoritative contract = the live spec.** When run via `/horizon-paper`, the
+> command fetches `GET /api/generation-spec`, which returns the *current* server
+> writing contract (the same blocks the server's own drafter uses). **Follow that
+> fetched `spec` exactly; if it differs from this file, the fetched spec wins.**
+> This file is a faithful summary for offline reference — the served spec is the
+> single source of truth and updates automatically as the pipeline evolves.
+
 ## Inputs you are given
 - `workingQuestion` — the north-star question the paper answers.
 - `emphasis` (themes, audience — usually `technical`, target length) and `clarifyAnswers` — shape scope, depth, and emphasis.
