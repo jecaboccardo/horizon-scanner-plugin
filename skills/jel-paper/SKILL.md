@@ -52,9 +52,11 @@ Draft an outline first (5–9 thematic sections), then write each section.
 4. **Synthesis / implications for LAC** — what the body implies for IADB policy;
    quantify where possible; name countries/contexts the evidence covers and gaps it leaves.
 5. **Works Cited (footer, mandatory).** A table of **only the papers you actually cited**
-   in prose, with columns: `#, Authors (Year), Title, Method, SMS, workId`. (The
-   `/horizon-scanner:horizon-paper` command controls output format; when it asks for a
-   cited-only footer, follow that — do NOT append a full all-papers table.)
+   in prose, with columns: `#, Authors (Year), Title, Method, SMS, DOI` — where DOI is the
+   row's `doi` rendered as `https://doi.org/<doi>`, else `https://doi.org/<workId>` when
+   `workId` is a `10.` DOI, else `—`. (The `/horizon-scanner:horizon-paper` command controls
+   output format; when it asks for a cited-only footer, follow that — do NOT append a full
+   all-papers table.)
 
 ## Voice
 IADB-grade, precise, evidence-first. Technical register by default (per

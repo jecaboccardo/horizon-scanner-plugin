@@ -33,7 +33,7 @@ and `x-tenant-id: $HORIZON_TENANT_ID`. On 401, tell them the key may be revoked 
 ## Step 1 — Clarify the search (unless `--no-clarify` or `--plan`)
 ▶ "Let me confirm a few things to focus the search."
 
-Ask the user these six dimensions **in one consolidated message** (show a sensible default for
+Ask the user these seven dimensions **in one consolidated message** (show a sensible default for
 each so they can just reply "defaults" or adjust a few). Detect hints from their question first
 (e.g. it mentions "Latin America" → default Region = LAC).
 
@@ -43,6 +43,7 @@ each so they can just reply "defaults" or adjust a few). Detect hints from their
 4. **Recency** — Recent frontier (2020+) · From 2000 · All years. *(default: All years)*
 5. **Breadth** — Balanced (direct + indirect) · Focused (on-topic only). *(default: Balanced)*
 6. **Sources to prioritize** — Use defaults (ABS 3+, IADB/WB/IMF/OECD, NBER/IZA/CEPR/SSRN) · or name specific tiers/repos/document types. *(default: defaults)*
+7. **Paper length** — Brief (~10 pages / ~5,000 words) · Standard (~20 pages / ~10,000 words) · Custom (give a word/page count). *(default: Standard)*
 
 Wait for their reply, then map to the request body:
 - Region → `filters.regions` (e.g. `["LAC"]`); No preference → omit.
@@ -51,6 +52,7 @@ Wait for their reply, then map to the request body:
 - Recency → `filters.timePeriod` = `"recent"` | `"2000+"` | `"all"` (and add `"recent"` to channels for the frontier option).
 - Breadth → `filters.evidenceMatch` = `"both"` | `"direct"`.
 - Sources → `filters.journalTiers` / `institutionalSources` / `workingPaperSources` / `publicationTypes`; defaults → omit (server applies defaults).
+- Length → remember the **target word count** (Brief≈5,000 · Standard≈10,000 · Custom=their number). You draft locally, so this just sizes your output: aim for roughly that total across the sections, scaling the number/depth of thematic sections to fit. State the target back ("Targeting ~10,000 words / ~20 pages").
 
 ## Step 2 — Build the base evidence table from the corpus
 ▶ "Retrieving the most relevant papers from the 488k-paper corpus with your filters…"
@@ -71,7 +73,9 @@ Take the plan `id`.
 
 ## Step 3 — Fetch the resolved evidence
 ▶ "Pulling the full evidence with metadata…"
-`GET /api/paper-plans/$PLAN_ID/bundle` → `{ workingQuestion, emphasis, evidence[] }`.
+`GET /api/paper-plans/$PLAN_ID/bundle` → `{ workingQuestion, emphasis, evidence[] }`. Each row has
+`workId, title, authors[], year, smsLevel, methodology, geography[], abstract, doi (canonical DOI or null),
+citationCount, venue`. **Keep the `doi` field** — it's required for the references/citations below.
 Show the user a numbered list of the base table (Authors · Year · short title · SMS).
 
 ## Step 4 — Creative-planner additions (unless `--no-expand`)
@@ -89,6 +93,10 @@ Report what verified vs evaporated.
 Present the additions as a checklist and **wait** for the user: "Keep all? Reply with numbers to DROP, or all / none."
 Apply their choice; confirm the final count ("Drafting over N papers: base + kept additions").
 
+▶ **Before generating, tell the user what they'll receive:** "I'll now write the paper (~<target> words).
+You'll get a **Word document (.docx)** of the paper and an **Excel spreadsheet (.xlsx)** of the cited
+evidence table, plus a Markdown source copy."
+
 ## Step 6 — Fetch the writing contract
 ▶ "Fetching the current writing standard so this matches the live pipeline…"
 `GET /api/generation-spec?audience=technical` → follow the returned `spec` exactly.
@@ -101,7 +109,26 @@ Obey the citation fence — only cite a real `[workId]` from the final set, as `
 
 **Footer = Works Cited only.** Do NOT append a full all-papers evidence table. The paper ends with a
 **Works Cited** table containing ONLY the papers you actually cited, columns:
-`#, Authors (Year), Title, Method, SMS, workId`.
+`#, Authors (Year), Title, Method, SMS, DOI`.
+Compute **DOI** per row as: the row's `doi` if present → render `https://doi.org/<doi>`; else if `workId`
+starts with `10.` → `https://doi.org/<workId>`; else `—` (no DOI on record). This mirrors the app's
+bibliography (`canonical_doi ?? (workId starts with 10. ? workId : null)`) so the references show real,
+clickable DOIs instead of internal ids.
+
+## Step 7b — Quality self-review (always — the plugin's full guardrail pass)
+▶ "Reviewing the draft — section completeness, claim audit, devil's advocate, coherence, citation spread, DOI check…"
+Run the **complete QUALITY SELF-REVIEW** from the fetched spec over your draft, then **revise it**. This
+mirrors the app's *entire* QA suite, done by one capable model:
+- **Completeness / section recovery:** no blank, near-empty, or truncated sections; each ends cleanly.
+- **Claim audit (all cited claims):** every claim traces to a cited `[workId]` whose evidence supports it — triage keep / soften / re-attribute / remove (removal last; when unsure, keep).
+- **Devil's advocate:** attack overstatement (single-study-as-fact, causal language on observational results, ignored contradictions, over-claiming LAC from non-LAC evidence); hedge / balance / add counter-evidence.
+- **Coherence:** one connected argument, consistent terms, abstract matches body, citations diversified.
+- **Citation spread / cite-what-matters + corpus-gap weaving:** cite the CORE set + each active channel; fill thin sections with uncited in-set papers, never inventions.
+- **Citation-retention:** revisions must not strip `[workId]` tags.
+- **DOI / Kris check:** every cited workId is in the set and renders a real DOI; flag any that can't resolve.
+- **Attribution:** author names verbatim from evidence.
+- **Final review:** each section delivers a clear "so what"; IADB-grade; nothing fabricated.
+Briefly report what you changed (e.g. "softened 3 over-strong claims, added 1 counter-finding, balanced citations across 6 more papers, re-drafted 1 thin section").
 
 ## Step 8 — Explain what was used
 After drafting, ▶ "Selecting the works actually cited…". In the terminal show ONLY the cited works
@@ -118,7 +145,7 @@ rest were off-topic or redundant and omitted."
    the Works Cited table as a real Word table.
 3. **`<base>-citations.xlsx`** (Excel) — the Works Cited table via a short Python script using **openpyxl**
    (`pip install --quiet openpyxl` if missing): one sheet "Works Cited", header row + one row per cited
-   paper (`#, Authors (Year), Title, Method, SMS, workId`).
+   paper (`#, Authors (Year), Title, Method, SMS, DOI`), using the same DOI rule as the prose footer.
 
 **Fallbacks (never block the user):** if neither pandoc nor python-docx can produce the .docx, keep the
 `.md` and say so. If openpyxl is unavailable, write `<base>-citations.csv` instead (Excel opens it natively)

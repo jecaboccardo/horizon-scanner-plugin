@@ -6,6 +6,18 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.5.0
+- **Full quality self-review pass** added to the contract + flow — mirrors the app's
+  *entire* QA suite: section recovery (completeness), claim audit (triage
+  keep/soften/re-attribute/remove), Devil's Advocate, coherence, citation spread /
+  cite-what-matters, corpus-gap weaving, citation-retention, DOI/Kris check, attribution,
+  and final review — performed by the one capable local model. (The citation fence
+  already prevented fabrication / bad DOIs, the Kris-class guarantee.)
+- **DOIs in citations**: the Works Cited table now shows real `https://doi.org/…` DOIs
+  (from the corpus `canonical_doi`, falling back to a `10.*` workId) instead of internal ids.
+- **Paper-length option** in the clarifier (Brief ~10pg / Standard ~20pg / Custom).
+- **Pre-generation notice** of the deliverables (Word `.docx` + Excel `.xlsx`).
+
 ## 0.4.0
 - Paper footer is now **Works Cited only** (the papers actually cited) — the full
   all-papers pool table was dropped.
