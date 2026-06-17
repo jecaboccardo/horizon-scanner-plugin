@@ -51,10 +51,10 @@ Draft an outline first (5–9 thematic sections), then write each section.
    evidence is thin, contested, or geographically narrow.
 4. **Synthesis / implications for LAC** — what the body implies for IADB policy;
    quantify where possible; name countries/contexts the evidence covers and gaps it leaves.
-5. **Evidence table (footer, mandatory).** A table of **every** paper in the evidence
-   set, in the given order, with columns: `#, Authors (Year), Title, Method, SMS,
-   Cited?`. Mark `Cited? = yes` for each workId you actually cited in prose, `no`
-   otherwise. This is the full table, not a cited-only reference list.
+5. **Works Cited (footer, mandatory).** A table of **only the papers you actually cited**
+   in prose, with columns: `#, Authors (Year), Title, Method, SMS, workId`. (The
+   `/horizon-scanner:horizon-paper` command controls output format; when it asks for a
+   cited-only footer, follow that — do NOT append a full all-papers table.)
 
 ## Voice
 IADB-grade, precise, evidence-first. Technical register by default (per
@@ -69,5 +69,5 @@ wrap the whole thing in a code fence.
 ## Self-check before finishing
 - Every `[workId]` you used exists in the evidence set. (Grep your draft's workIds
   against the set; remove or fix any that don't match.)
-- The evidence table lists every evidence row and its Cited? flag is accurate.
+- The Works Cited table lists every paper you cited — and only those.
 - No invented papers, authors, numbers, or findings.

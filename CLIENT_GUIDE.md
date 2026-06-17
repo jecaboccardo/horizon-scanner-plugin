@@ -81,10 +81,11 @@ know what's happening.
 5. **Writing** — the paper is drafted in front of you, section by section, with citations.
 6. **What was used** — at the end Claude shows **only the papers actually cited** and explains
    how they were selected (relevance + credibility), rather than the whole pool.
-7. **Saved** — you get **two files**: the paper `horizon-paper-….md` (with the full evidence
-   table) and `horizon-paper-…-citations.md` (a Works Cited table of just the papers used).
+7. **Saved** — you get the paper as **Word** (`horizon-paper-….docx`) and the citations as
+   **Excel** (`horizon-paper-…-citations.xlsx`), plus a `.md` source copy. The paper ends with a
+   **Works Cited** list of just the papers used (no full pool table).
 
-Open the paper to read or share it. You can also upload it back into the Horizon Scanner Library.
+Open the Word file to read or share it. You can also upload it back into the Horizon Scanner Library.
 
 ---
 

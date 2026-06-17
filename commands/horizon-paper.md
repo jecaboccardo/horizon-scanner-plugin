@@ -99,17 +99,28 @@ theme, cite only papers relevant + credible to each section (cite-what-matters),
 match each study's rigor." Then draft, printing ▶ "Drafting: <section heading>…" before each section.
 Obey the citation fence — only cite a real `[workId]` from the final set, as `Author (year) [workId]`.
 
-## Step 8 — Build the outputs and explain
-After drafting, ▶ "Selecting the works actually cited and building the references…". Then:
-1. **In the terminal, show ONLY the works you actually cited** (the "used" set), not the whole pool,
-   with one line explaining selection: "Of N candidate papers, the paper cites M — chosen for on-topic
-   relevance and credibility (causal rigor / foundational citation / recency); the rest were off-topic
-   or redundant and omitted."
-2. **The paper file** keeps the full evidence-table footer (every paper, `Cited?` flagged) per the JEL
-   contract — written into the `.md`.
-3. **Also write a separate citations file** `<out>-citations.md` containing a **Works Cited** table of
-   ONLY the cited papers, same columns as the evidence table: `#, Authors (Year), Title, Method, SMS, workId`.
+**Footer = Works Cited only.** Do NOT append a full all-papers evidence table. The paper ends with a
+**Works Cited** table containing ONLY the papers you actually cited, columns:
+`#, Authors (Year), Title, Method, SMS, workId`.
 
-## Step 9 — Save
-▶ "Saving…" Write the paper to `--out` (default `./horizon-paper-<PLAN_ID>.md`) and the citations table to
-`<same>-citations.md`. Print both paths and note: this ran entirely on the user's Claude subscription — no web-app AI spend.
+## Step 8 — Explain what was used
+After drafting, ▶ "Selecting the works actually cited…". In the terminal show ONLY the cited works
+(not the whole pool) and one line explaining selection: "Of N candidate papers, the paper cites M —
+chosen for on-topic relevance and credibility (causal rigor / foundational citation / recency); the
+rest were off-topic or redundant and omitted."
+
+## Step 9 — Save as Word + Excel
+▶ "Exporting to Word and Excel…". Produce three files next to `--out` (default base `./horizon-paper-<PLAN_ID>`):
+1. **`<base>.md`** — always write this first (the source of truth; never fails).
+2. **`<base>.docx`** (Word) — convert the paper. Prefer `pandoc "<base>.md" -o "<base>.docx"` if pandoc
+   is on PATH; else run a short Python script with **python-docx** (`pip install --quiet python-docx` if
+   missing) that writes the title as Heading 0, `##` sections as Heading 1, paragraphs as body text, and
+   the Works Cited table as a real Word table.
+3. **`<base>-citations.xlsx`** (Excel) — the Works Cited table via a short Python script using **openpyxl**
+   (`pip install --quiet openpyxl` if missing): one sheet "Works Cited", header row + one row per cited
+   paper (`#, Authors (Year), Title, Method, SMS, workId`).
+
+**Fallbacks (never block the user):** if neither pandoc nor python-docx can produce the .docx, keep the
+`.md` and say so. If openpyxl is unavailable, write `<base>-citations.csv` instead (Excel opens it natively)
+and say so. Print every file path produced, and note: this ran entirely on the user's Claude subscription —
+no web-app AI spend.
