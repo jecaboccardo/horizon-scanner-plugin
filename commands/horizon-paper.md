@@ -33,16 +33,21 @@ and `x-tenant-id: $HORIZON_TENANT_ID`. On 401, tell them the key may be revoked 
 ## Step 1 — Clarify the search (unless `--no-clarify` or `--plan`)
 ▶ "Let me confirm a few things to focus the search."
 
-Ask the user these six dimensions **in one consolidated message** (show a sensible default for
-each so they can just reply "defaults" or adjust a few). Detect hints from their question first
-(e.g. it mentions "Latin America" → default Region = LAC).
+Show ALL SIX dimensions as a numbered checklist in ONE message. **HARD RULES — do not violate:**
+for EVERY dimension you MUST print its default AND the concrete alternative options, so the user
+makes an *informed* choice. NEVER skip a dimension. NEVER silently apply defaults without showing
+them. In particular you MUST always show **#4 Years/recency** and **#5 Sources** (spelling out the
+actual default source set) — these are the ones most often wrongly skipped. Detect hints from the
+question and pre-fill the default (e.g. "Latin America" → Region = LAC), but still display every
+dimension. End the message with: *"Reply `defaults` to accept all, or tell me what to change."*
+Then **WAIT** for the reply before retrieving — do not proceed on your own.
 
-1. **Region** — LAC · a specific other region · No preference. *(default: detected, else No preference)*
-2. **Population focus** — children / adolescents / adults / women / rural / etc., or none. *(default: none)*
-3. **Evidence type to prioritize** — Causal (RCT/DiD/IV) · Foundational (seminal/high-cite) · both. *(default: both)*
-4. **Recency** — Recent frontier (2020+) · From 2000 · All years. *(default: All years)*
-5. **Sources to prioritize** — Use defaults (ABS 3+, IADB/WB/IMF/OECD, NBER/IZA/CEPR/SSRN) · or name specific tiers/repos/document types. *(default: defaults)*
-6. **Paper length** — Brief (~10 pages / ~5,000 words) · Standard (~20 pages / ~10,000 words) · Custom (give a word/page count). *(default: Standard)*
+1. **Region** — *default:* `<detected, else No preference>`. Options: LAC · a specific other region (USA & Canada · Europe & Central Asia · Sub-Saharan Africa · South & SE Asia · MENA) · No preference.
+2. **Population focus** — *default:* none. Options: children · adolescents · adults · women/girls · rural · urban · low-income · none.
+3. **Evidence type** — *default:* both. Options: Causal (RCT/DiD/IV/RDD) · Foundational (seminal / high-cite) · both.
+4. **Years / recency** — *default:* All years. Options: **Recent frontier (2020+)** · **From 2000 onwards** · **All years**. (ALWAYS ask — never assume the year range.)
+5. **Sources** — *default:* the standard set, which you MUST spell out every time: **journals ABS 3+ · institutions IADB, World Bank, IMF, OECD · working papers NBER, IZA, CEPR/RePEc, SSRN**. Options: accept that default, OR choose specific journal tiers / repositories / document types (journal articles · working papers · reports & grey-lit · books). (ALWAYS show the default set AND offer to change it — never just say "using defaults".)
+6. **Paper length** — *default:* Standard (~20 pages / ~10,000 words). Options: Brief (~10pg / ~5,000w) · Standard · Custom (give a word/page count).
 
 Wait for their reply, then map to the request body:
 - Region → `filters.regions` (e.g. `["LAC"]`); No preference → omit.
@@ -74,7 +79,7 @@ Take the plan `id`.
 `GET /api/paper-plans/$PLAN_ID/bundle` → `{ workingQuestion, emphasis, evidence[] }`. Each row has
 `workId, title, authors[], year, smsLevel, methodology, geography[], abstract, doi (canonical DOI or null),
 citationCount, venue`. **Keep the `doi` field** — it's required for the references/citations below.
-Show the user a numbered list of the base table (Authors · Year · short title · SMS).
+Show the user a numbered table of the base evidence with columns **# · Authors · Year · Venue · Title · SMS** — the bundle carries `venue` and `year` for every row, so ALWAYS include them (never drop venue/year).
 
 ## Step 4 — Creative-planner additions (unless `--no-expand`)
 ▶ "Now I'll propose seminal/relevant papers the table may be missing, then verify each one against the corpus (nothing fabricated)…"
@@ -100,7 +105,11 @@ BOTH together** for an informed decision — never present additions in isolatio
 3. Note any genuinely-relevant work that was found but cut as `over_cap`, so the user can opt to keep it.
 
 Then **wait** for the user: "Keep all? Reply with numbers to DROP, or all / none."
-Apply their choice; confirm the final count ("Drafting over N papers: base + kept additions").
+Apply their choice, then **show the FINAL evidence table** — this is a HARD RULE, not optional: the
+complete definitive set the paper will draw from (base retrieved + kept additions), as ONE numbered
+table with columns **# · Authors (Year) · Venue · Title · SMS · Source** (Source = `📚 retrieved` or
+`➕ added`). The user MUST see every paper — with its title, venue, and year — before drafting, not
+just a count. Then confirm "Drafting over N papers."
 
 ▶ **Before generating, tell the user what they'll receive:** "I'll now write the paper (~<target> words).
 You'll get a **Word document (.docx)** of the paper and an **Excel spreadsheet (.xlsx)** of the cited

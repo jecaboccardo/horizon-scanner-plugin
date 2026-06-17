@@ -6,6 +6,17 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.5.3
+- **Clarifier reliability (HARD RULES).** Step 1 was being collapsed — runs skipped the **Years/recency**
+  question and the **Sources** confirmation, silently applying defaults. Now every one of the six
+  dimensions MUST be shown with its default AND concrete options, and #4 (years: Recent 2020+ / From
+  2000 / All years) and #5 (sources: the default set spelled out — ABS 3+ · IADB/WB/IMF/OECD ·
+  NBER/IZA/CEPR/SSRN — plus "or choose specific tiers/repos/types") are called out as never-skip.
+- **Base evidence table now shows Venue + Year** (columns: # · Authors · Year · Venue · Title · SMS).
+- **Final evidence table before drafting (new, mandatory):** after the keep/drop gate, the plugin shows
+  the COMPLETE set it will draw from — base retrieved + LLM-added together — as one numbered table with
+  Authors (Year) · Venue · Title · SMS · Source (📚 retrieved / ➕ added), not just a paper count.
+
 ## 0.5.2
 - **Review gate now re-shows the base evidence table alongside the proposed additions.**
   In a terminal the base table (from the search step) had scrolled out of view by the time
