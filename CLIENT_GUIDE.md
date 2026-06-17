@@ -105,6 +105,27 @@ Open the Word file to read or share it. You can also upload it back into the Hor
 
 ---
 
+## Staying up to date
+
+- **Where the plugin lives:** https://github.com/jecaboccardo/horizon-scanner-plugin
+- **What's new:** the [CHANGELOG](https://github.com/jecaboccardo/horizon-scanner-plugin/blob/main/CHANGELOG.md)
+  lists every version's changes.
+- **Your installed version:** run `/plugin` in Claude Code — it shows the version you have.
+  Claude Code flags "update available" when a newer version is published.
+- **To update** (occasionally, or when you see an update is available):
+  ```
+  /plugin marketplace update horizon-scanner
+  /plugin update horizon-scanner
+  /reload-plugins
+  ```
+- You **don't** need to update for evidence-quality or writing improvements — those come from
+  the Horizon Scanner service and apply automatically. Updates only matter for changes to the
+  plugin's own commands (e.g. new questions, new export formats).
+
+The same version + changelog link is shown in the app's **"Set up Claude Code"** panel.
+
+---
+
 ## If something goes wrong
 
 | You see | What to do |
