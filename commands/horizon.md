@@ -1,6 +1,6 @@
 ---
 description: Build an evidence table from the Horizon Scanner corpus and write a JEL survey paper — entirely in your terminal, on your own Claude subscription. Asks clarifying questions, narrates each step, and saves the paper + a citations table.
-argument-hint: "<research question>"  |  --plan <planId>  [--no-expand] [--no-clarify] [--out <path>]
+argument-hint: <your research question — plain text, no quotes>  |  --plan <planId>  [--no-expand] [--no-clarify] [--out <path>]
 allowed-tools: Bash, Read, Write, WebFetch
 ---
 

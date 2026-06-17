@@ -43,10 +43,10 @@ press Enter, then the next):
 4. `/horizon-scanner:horizon-login hsk_…`  → saves your key (you won't have to do this again)
 
 > ⚠️ Order matters: `/horizon-scanner:horizon-login` only works **after** `/reload-plugins` — that's
-> why it's line 4. If `/horizon-scanner:horizon-login` or `/horizon-scanner:horizon-paper` says "not recognized," run
+> why it's line 4. If `/horizon-scanner:horizon-login` or `/horizon-scanner:horizon` says "not recognized," run
 > `/reload-plugins` and try again.
 
-You'll see **"Saved. You can now run /horizon-scanner:horizon-paper."** Setup is done — you never
+You'll see **"Saved. You can now run /horizon-scanner:horizon."** Setup is done — you never
 repeat Steps 1–2.
 
 ---
@@ -56,12 +56,12 @@ repeat Steps 1–2.
 In Claude Code, type:
 
 ```
-/horizon-scanner:horizon-paper "your research question"
+/horizon-scanner:horizon your research question
 ```
 
 For example:
 ```
-/horizon-scanner:horizon-paper "returns to schooling from information interventions in Latin America"
+/horizon-scanner:horizon returns to schooling from information interventions in Latin America
 ```
 
 Claude narrates each step as it goes (you'll see a `▶` line before each), so you always
@@ -99,9 +99,9 @@ Open the Word file to read or share it. You can also upload it back into the Hor
 - **Cost.** Generating the paper uses your own Claude subscription — it isn't billed
   to Horizon Scanner.
 - **Two ways to start a paper:**
-  - From a question, as above: `/horizon-scanner:horizon-paper "…"`.
+  - From a question, as above: `/horizon-scanner:horizon …`.
   - From a table you already curated in the web app's Paper Studio: use the plan id
-    with `/horizon-scanner:horizon-paper --plan <id>`.
+    with `/horizon-scanner:horizon --plan <id>`.
 
 ---
 
@@ -132,7 +132,7 @@ The same version + changelog link is shown in the app's **"Set up Claude Code"**
 |---|---|
 | *"run /horizon-scanner:horizon-login first"* | You skipped Step 2 — run `/horizon-scanner:horizon-login <your key>` (copy it again from the app's "Set up Claude Code"). |
 | A **401 / unauthorized** error | Your key was revoked or replaced — get a fresh one from the app and run `/horizon-scanner:horizon-login` again. |
-| `/horizon-scanner:horizon-paper` isn't recognized | The plugin didn't install — re-run the two `/plugin …` lines from Step 2. |
+| `/horizon-scanner:horizon` isn't recognized | The plugin didn't install — re-run the two `/plugin …` lines from Step 2. |
 | It seems stuck | Large papers take a few minutes (the corpus search and drafting are real work). Give it time; if it errors, just run the command again. |
 
 Need help? Contact your Horizon Scanner administrator.

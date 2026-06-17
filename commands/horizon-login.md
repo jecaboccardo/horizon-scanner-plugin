@@ -1,5 +1,5 @@
 ---
-description: Save your Horizon Scanner plugin key once, so /horizon-paper just works (no env vars, no devtools).
+description: Save your Horizon Scanner plugin key once, so /horizon-scanner:horizon just works (no env vars, no devtools).
 argument-hint: <hsk_key> [--base <url>] [--tenant <id>]
 allowed-tools: Bash
 ---
@@ -30,7 +30,7 @@ have to set environment variables or paste a token again.
    JSON
    chmod 600 "$HOME/.horizon-scanner/config.json"
    ```
-3. Confirm: print "Saved. You can now run /horizon-paper." — and DO NOT echo the full
+3. Confirm: print "Saved. You can now run /horizon-scanner:horizon." — and DO NOT echo the full
    key back (show only its prefix, e.g. the first 10 characters).
 
 The key is a durable, revocable credential scoped to the paper-building endpoints only —

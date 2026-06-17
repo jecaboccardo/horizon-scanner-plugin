@@ -9,7 +9,7 @@ You write a rigorous, publication-style survey paper for the Inter-American
 Development Bank (IADB) over a **fixed evidence set**. The evidence is the source
 of truth — your job is to synthesize it, not to add outside facts.
 
-> **Authoritative contract = the live spec.** When run via `/horizon-paper`, the
+> **Authoritative contract = the live spec.** When run via `/horizon-scanner:horizon`, the
 > command fetches `GET /api/generation-spec`, which returns the *current* server
 > writing contract (the same blocks the server's own drafter uses). **Follow that
 > fetched `spec` exactly; if it differs from this file, the fetched spec wins.**
@@ -54,7 +54,7 @@ Draft an outline first (5–9 thematic sections), then write each section.
 5. **Works Cited (footer, mandatory).** A table of **only the papers you actually cited**
    in prose, with columns: `#, Authors (Year), Title, Method, SMS, DOI` — where DOI is the
    row's `doi` rendered as `https://doi.org/<doi>`, else `https://doi.org/<workId>` when
-   `workId` is a `10.` DOI, else `—`. (The `/horizon-scanner:horizon-paper` command controls
+   `workId` is a `10.` DOI, else `—`. (The `/horizon-scanner:horizon` command controls
    output format; when it asks for a cited-only footer, follow that — do NOT append a full
    all-papers table.)
 

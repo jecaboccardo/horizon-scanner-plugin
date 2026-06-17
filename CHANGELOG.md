@@ -6,6 +6,18 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.5.4
+- **First-run welcome in the terminal (no manual needed).** A `SessionStart` hook
+  (`hooks/hooks.json` → `scripts/welcome.mjs`) prints a one-time, login-aware tip: if not
+  logged in it shows the two setup steps; once logged in it shows *"✅ ready — just type
+  `/horizon-scanner:horizon <your question>`"*. Shows once per machine (sentinel
+  `~/.horizon-scanner/.welcomed`); fail-safe, never blocks the session; cross-platform (Node).
+- **Shorter command: `/horizon-scanner:horizon`** (renamed from `…:horizon-paper`). Bare
+  `/horizon` is not possible — Claude Code plugin commands are always namespaced — so this is
+  the shortest reliable form.
+- **No quotes needed.** `$ARGUMENTS` already captures the whole line; the misleading quotes were
+  removed from the argument hint and all examples. Type the question in plain English.
+
 ## 0.5.3
 - **Clarifier reliability (HARD RULES).** Step 1 was being collapsed — runs skipped the **Years/recency**
   question and the **Sources** confirmation, silently applying defaults. Now every one of the six

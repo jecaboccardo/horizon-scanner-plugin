@@ -1,9 +1,10 @@
 {
   "name": "horizon-scanner",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Generate IADB-grade JEL survey papers from your Horizon Scanner evidence, using your own Claude subscription. The web app curates + grounds the evidence; your local Claude writes the paper.",
   "author": {
     "name": "Horizon Scanner (IADB)"
   },
-  "keywords": ["iadb", "evidence", "survey", "jel", "literature-review"]
+  "keywords": ["iadb", "evidence", "survey", "jel", "literature-review"],
+  "hooks": "./hooks/hooks.json"
 }
