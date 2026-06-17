@@ -89,6 +89,31 @@ installs always get the latest commit; existing users only update when they ask.
 > update. Only changes to the plugin's *own files* (the commands, the skill text, the export
 > logic) require a version bump + a user update.
 
+## Publishing to a standalone repo (clean client distribution)
+
+`claude-plugin/` is **self-contained** (it carries its own `.claude-plugin/marketplace.json`
+with `source: "."`), so it can be published as the *root* of a dedicated repo — clients then
+install from that repo and never see the app's source. **The main repo stays the single source**
+— you publish a mirror, you don't maintain two copies (no drift).
+
+**One-time:** create the GitHub repo (e.g. `iadb/horizon-scanner-plugin`).
+
+**On each release** (after bumping `version` + CHANGELOG, from the main repo root):
+```bash
+git subtree push --prefix=claude-plugin https://github.com/iadb/horizon-scanner-plugin.git main
+```
+That pushes only the `claude-plugin/` subtree to the standalone repo's `main`. Clients then:
+```
+/plugin marketplace add iadb/horizon-scanner-plugin
+/plugin install horizon-scanner@horizon-scanner
+```
+…and update with `/plugin marketplace update horizon-scanner` + `/reload-plugins`.
+
+> If `git subtree push` is slow on a large history, the alternative is a clean mirror: copy
+> `claude-plugin/*` into a fresh checkout of the standalone repo, commit, and push. Set
+> `VITE_PLUGIN_MARKETPLACE=iadb/horizon-scanner-plugin` in Vercel so the in-app "Set up Claude Code"
+> snippet points clients at the standalone repo.
+
 ## Notes / limits
 
 - **Anthropic terms**: you run your own Claude Code on your own data — confirm this
