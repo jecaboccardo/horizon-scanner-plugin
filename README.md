@@ -69,6 +69,26 @@ into the Horizon Scanner Library, or keep it locally.
 - `GET  /api/generation-spec` — the live JEL writing contract (same single source the
   server's own drafter uses), so the plugin's output tracks the pipeline automatically.
 
+## Updating the plugin (getting new changes to users)
+
+Plugins are **not** auto-updated — a user's install is a clone from install time.
+
+**Maintainer (on every change):** bump `version` in `.claude-plugin/plugin.json` (semver),
+commit, and push. The version bump is what lets Claude Code flag "update available." New
+installs always get the latest commit; existing users only update when they ask.
+
+**User (to pull the latest):**
+```
+/plugin marketplace update horizon-scanner
+/plugin update horizon-scanner            # or re-run /plugin install horizon-scanner@horizon-scanner
+/reload-plugins
+```
+
+> Because the read-only API endpoints and the writing contract (`/api/generation-spec`) are
+> served by the app, **server-side improvements reach every user immediately** with no plugin
+> update. Only changes to the plugin's *own files* (the commands, the skill text, the export
+> logic) require a version bump + a user update.
+
 ## Notes / limits
 
 - **Anthropic terms**: you run your own Claude Code on your own data — confirm this
