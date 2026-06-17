@@ -6,6 +6,18 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.5.2
+- **Review gate now re-shows the base evidence table alongside the proposed additions.**
+  In a terminal the base table (from the search step) had scrolled out of view by the time
+  the additions appeared, so the keep/drop decision was made without seeing what was already
+  in the set. Step 5 now recaps the base papers, then lists additions — and flags each addition
+  as on-topic vs merely adjacent (the grounding can surface same-keyword-but-different-literature
+  papers, e.g. *returns-estimation* papers for an *information-intervention* question), plus
+  calls out any relevant work cut as `over_cap`. Low-confidence adds are still shown — with a
+  caveat — never silently dropped.
+- **Lowered the creative-planner net-add cap 15 → 8** so the additions list stays focused and the
+  adjacent-literature noise can't crowd out genuinely-missing seminal works.
+
 ## 0.5.1
 - **Dropped the "Breadth" clarifying question** (Balanced vs Focused). The web app's
   direct/indirect/excluded classifier was removed (relevance-first redesign 2026-06-17) —

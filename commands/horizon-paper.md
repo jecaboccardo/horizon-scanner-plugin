@@ -83,12 +83,23 @@ From your own knowledge, propose 3–7 `subQueries`, 4–10 `namedWorks` (`{titl
 ```bash
 curl -sS -X POST "$HORIZON_API_BASE/api/paper-plans/$PLAN_ID/ground" -H "Authorization: Bearer $HORIZON_API_TOKEN" \
   -H "x-tenant-id: $HORIZON_TENANT_ID" -H "Content-Type: application/json" \
-  -d '{"subQueries":[...],"namedWorks":[...],"literatures":[...],"cap":15}'
+  -d '{"subQueries":[...],"namedWorks":[...],"literatures":[...],"cap":8}'
 ```
 Report what verified vs evaporated.
 
 ## Step 5 — REVIEW GATE (always)
-Present the additions as a checklist and **wait** for the user: "Keep all? Reply with numbers to DROP, or all / none."
+The user decided on additions several screens after the base table scrolled away, so **re-show
+BOTH together** for an informed decision — never present additions in isolation:
+1. **Recap the base evidence table** (the papers already in the set from Step 3) — compact: `#`,
+   Authors (Year), short title, SMS. A first-timer needs to see "what do I already have?" to judge
+   whether an addition is new or redundant.
+2. **Then the proposed additions** as a keep/drop checklist, and for EACH addition flag whether it's
+   on-topic vs merely adjacent to the question (the grounding can surface same-keyword-but-different-
+   literature papers — e.g. for an *information-intervention* question it may pull in *returns-
+   estimation* papers). Help the user judge; don't just list them.
+3. Note any genuinely-relevant work that was found but cut as `over_cap`, so the user can opt to keep it.
+
+Then **wait** for the user: "Keep all? Reply with numbers to DROP, or all / none."
 Apply their choice; confirm the final count ("Drafting over N papers: base + kept additions").
 
 ▶ **Before generating, tell the user what they'll receive:** "I'll now write the paper (~<target> words).
