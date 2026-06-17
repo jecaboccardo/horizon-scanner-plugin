@@ -64,19 +64,27 @@ For example:
 /horizon-scanner:horizon-paper "returns to schooling from information interventions in Latin America"
 ```
 
-### What you'll see
-1. **Searching the corpus** — Claude pulls the most relevant papers from the
-   Horizon Scanner library and lists them.
-2. **Suggested additions** — Claude proposes important papers that might be
-   missing; each one is checked against the real corpus (nothing is invented).
-3. **Your review** — Claude shows the suggested additions and asks which to keep.
-   Reply with the numbers to drop, or **"all"** to keep them, or **"none"**.
-4. **Writing** — the paper is drafted in front of you: introduction, thematic
-   sections with citations, and a full evidence table at the end.
-5. **Saved** — you get a file named `horizon-paper-….md` in your folder.
+Claude narrates each step as it goes (you'll see a `▶` line before each), so you always
+know what's happening.
 
-Open that file to read or share the paper. You can also upload it back into the
-Horizon Scanner Library.
+### What you'll see
+1. **A few clarifying questions** — like the web app: region, population focus, evidence
+   type (causal/foundational), recency, breadth (balanced vs focused), and which sources to
+   prioritize. Each has a sensible default — reply **"defaults"** to accept, or adjust a few.
+   (Add `--no-clarify` to skip and use defaults.)
+2. **Searching the corpus** — Claude retrieves the most relevant papers with your filters and
+   lists them.
+3. **Suggested additions** — Claude proposes important/seminal papers that might be missing;
+   each is verified against the real corpus (nothing is invented).
+4. **Your review** — Claude shows the additions and asks which to keep (reply with numbers to
+   drop, or **"all"** / **"none"**).
+5. **Writing** — the paper is drafted in front of you, section by section, with citations.
+6. **What was used** — at the end Claude shows **only the papers actually cited** and explains
+   how they were selected (relevance + credibility), rather than the whole pool.
+7. **Saved** — you get **two files**: the paper `horizon-paper-….md` (with the full evidence
+   table) and `horizon-paper-…-citations.md` (a Works Cited table of just the papers used).
+
+Open the paper to read or share it. You can also upload it back into the Horizon Scanner Library.
 
 ---
 
