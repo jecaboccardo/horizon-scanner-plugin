@@ -69,8 +69,8 @@ know what's happening.
 
 ### What you'll see
 1. **A few clarifying questions** — like the web app: region, population focus, evidence
-   type (causal/foundational), recency, breadth (balanced vs focused), and which sources to
-   prioritize. Each has a sensible default — reply **"defaults"** to accept, or adjust a few.
+   type (causal/foundational), recency, which sources to prioritize, and paper length.
+   Each has a sensible default — reply **"defaults"** to accept, or adjust a few.
    (Add `--no-clarify` to skip and use defaults.)
 2. **Searching the corpus** — Claude retrieves the most relevant papers with your filters and
    lists them.

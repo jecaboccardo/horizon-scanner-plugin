@@ -33,7 +33,7 @@ and `x-tenant-id: $HORIZON_TENANT_ID`. On 401, tell them the key may be revoked 
 ## Step 1 — Clarify the search (unless `--no-clarify` or `--plan`)
 ▶ "Let me confirm a few things to focus the search."
 
-Ask the user these seven dimensions **in one consolidated message** (show a sensible default for
+Ask the user these six dimensions **in one consolidated message** (show a sensible default for
 each so they can just reply "defaults" or adjust a few). Detect hints from their question first
 (e.g. it mentions "Latin America" → default Region = LAC).
 
@@ -41,16 +41,14 @@ each so they can just reply "defaults" or adjust a few). Detect hints from their
 2. **Population focus** — children / adolescents / adults / women / rural / etc., or none. *(default: none)*
 3. **Evidence type to prioritize** — Causal (RCT/DiD/IV) · Foundational (seminal/high-cite) · both. *(default: both)*
 4. **Recency** — Recent frontier (2020+) · From 2000 · All years. *(default: All years)*
-5. **Breadth** — Balanced (direct + indirect) · Focused (on-topic only). *(default: Balanced)*
-6. **Sources to prioritize** — Use defaults (ABS 3+, IADB/WB/IMF/OECD, NBER/IZA/CEPR/SSRN) · or name specific tiers/repos/document types. *(default: defaults)*
-7. **Paper length** — Brief (~10 pages / ~5,000 words) · Standard (~20 pages / ~10,000 words) · Custom (give a word/page count). *(default: Standard)*
+5. **Sources to prioritize** — Use defaults (ABS 3+, IADB/WB/IMF/OECD, NBER/IZA/CEPR/SSRN) · or name specific tiers/repos/document types. *(default: defaults)*
+6. **Paper length** — Brief (~10 pages / ~5,000 words) · Standard (~20 pages / ~10,000 words) · Custom (give a word/page count). *(default: Standard)*
 
 Wait for their reply, then map to the request body:
 - Region → `filters.regions` (e.g. `["LAC"]`); No preference → omit.
 - Population → `filters.populationFocus` (array of chips); none → omit.
 - Evidence type → top-level `channels` (`"causal"` and/or `"foundational"`).
 - Recency → `filters.timePeriod` = `"recent"` | `"2000+"` | `"all"` (and add `"recent"` to channels for the frontier option).
-- Breadth → `filters.evidenceMatch` = `"both"` | `"direct"`.
 - Sources → `filters.journalTiers` / `institutionalSources` / `workingPaperSources` / `publicationTypes`; defaults → omit (server applies defaults).
 - Length → remember the **target word count** (Brief≈5,000 · Standard≈10,000 · Custom=their number). You draft locally, so this just sizes your output: aim for roughly that total across the sections, scaling the number/depth of thematic sections to fit. State the target back ("Targeting ~10,000 words / ~20 pages").
 

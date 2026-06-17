@@ -6,6 +6,13 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.5.1
+- **Dropped the "Breadth" clarifying question** (Balanced vs Focused). The web app's
+  direct/indirect/excluded classifier was removed (relevance-first redesign 2026-06-17) —
+  evidence-table membership is now decided by a cosine relevance floor, so `evidenceMatch`
+  no longer affects retrieval. Clarifying questions are now six (region, population, evidence
+  type, recency, sources, length); the `evidenceMatch` mapping is gone from the request body.
+
 ## 0.5.0
 - **Full quality self-review pass** added to the contract + flow — mirrors the app's
   *entire* QA suite: section recovery (completeness), claim audit (triage
