@@ -34,12 +34,17 @@ You need two things:
 
 ## Step 2 — Paste it into Claude Code (one time)
 
-Open Claude Code and run the three copied lines **one at a time** (paste a line,
+Open Claude Code and run the copied lines **one at a time, in order** (paste a line,
 press Enter, then the next):
 
 1. `/plugin marketplace add …`  → registers the Horizon Scanner plugin
 2. `/plugin install horizon-scanner@horizon-scanner`  → installs it
-3. `/horizon-login hsk_…`  → saves your key (you won't have to do this again)
+3. `/reload-plugins`  → **activates** the new commands (required before the next line)
+4. `/horizon-login hsk_…`  → saves your key (you won't have to do this again)
+
+> ⚠️ Order matters: `/horizon-login` only works **after** `/reload-plugins` — that's
+> why it's line 4. If `/horizon-login` or `/horizon-paper` says "not recognized," run
+> `/reload-plugins` and try again.
 
 You'll see **"Saved. You can now run /horizon-paper."** Setup is done — you never
 repeat Steps 1–2.
