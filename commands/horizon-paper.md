@@ -15,13 +15,25 @@ paper with the `jel-paper` skill. Nothing is billed to the web app's AI budget.
 
 Flags: `--no-expand` (skip the creative-planner additions), `--out <path>` (output file).
 
-## Required environment (stop and ask the user to set any that are missing — never invent a token)
-- `HORIZON_API_BASE` — e.g. `https://horizon-api.nextminder.com` or `http://localhost:3002`
-- `HORIZON_API_TOKEN` — the user's access token (sent as `Authorization: Bearer`)
-- `HORIZON_TENANT_ID` — their tenant id (sent as `x-tenant-id`)
+## Credentials — read the saved config first (fall back to env vars)
+Before anything else, load the credentials the user saved with `/horizon-login`:
+```bash
+CFG="$HOME/.horizon-scanner/config.json"
+if [ -f "$CFG" ]; then
+  HORIZON_API_BASE=$(node -e "console.log(require('$CFG').apiBase||'')" 2>/dev/null || python -c "import json;print(json.load(open('$CFG')).get('apiBase',''))")
+  HORIZON_API_TOKEN=$(node -e "console.log(require('$CFG').token||'')" 2>/dev/null || python -c "import json;print(json.load(open('$CFG')).get('token',''))")
+  HORIZON_TENANT_ID=$(node -e "console.log(require('$CFG').tenantId||'')" 2>/dev/null || python -c "import json;print(json.load(open('$CFG')).get('tenantId',''))")
+fi
+```
+If the config file is absent, fall back to the env vars `HORIZON_API_BASE` /
+`HORIZON_API_TOKEN` / `HORIZON_TENANT_ID`. If, after both, the token is still empty,
+STOP and tell the user to run **`/horizon-login <key>`** first (key from the web app →
+account → "Set up Claude Code"). Never invent a token.
 
-Every API call below MUST send both auth headers. If a call returns 401/404/non-JSON,
-report the exact error and stop — never fabricate evidence.
+Every API call below MUST send both auth headers (`Authorization: Bearer $HORIZON_API_TOKEN`
+and `x-tenant-id: $HORIZON_TENANT_ID`). If a call returns 401, the key may be revoked or
+expired — tell the user to re-run `/horizon-login`. On 404/non-JSON, report it and stop —
+never fabricate evidence.
 
 ---
 
