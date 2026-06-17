@@ -40,13 +40,13 @@ press Enter, then the next):
 1. `/plugin marketplace add …`  → registers the Horizon Scanner plugin
 2. `/plugin install horizon-scanner@horizon-scanner`  → installs it
 3. `/reload-plugins`  → **activates** the new commands (required before the next line)
-4. `/horizon-login hsk_…`  → saves your key (you won't have to do this again)
+4. `/horizon-scanner:horizon-login hsk_…`  → saves your key (you won't have to do this again)
 
-> ⚠️ Order matters: `/horizon-login` only works **after** `/reload-plugins` — that's
-> why it's line 4. If `/horizon-login` or `/horizon-paper` says "not recognized," run
+> ⚠️ Order matters: `/horizon-scanner:horizon-login` only works **after** `/reload-plugins` — that's
+> why it's line 4. If `/horizon-scanner:horizon-login` or `/horizon-scanner:horizon-paper` says "not recognized," run
 > `/reload-plugins` and try again.
 
-You'll see **"Saved. You can now run /horizon-paper."** Setup is done — you never
+You'll see **"Saved. You can now run /horizon-scanner:horizon-paper."** Setup is done — you never
 repeat Steps 1–2.
 
 ---
@@ -56,12 +56,12 @@ repeat Steps 1–2.
 In Claude Code, type:
 
 ```
-/horizon-paper "your research question"
+/horizon-scanner:horizon-paper "your research question"
 ```
 
 For example:
 ```
-/horizon-paper "returns to schooling from information interventions in Latin America"
+/horizon-scanner:horizon-paper "returns to schooling from information interventions in Latin America"
 ```
 
 ### What you'll see
@@ -90,9 +90,9 @@ Horizon Scanner Library.
 - **Cost.** Generating the paper uses your own Claude subscription — it isn't billed
   to Horizon Scanner.
 - **Two ways to start a paper:**
-  - From a question, as above: `/horizon-paper "…"`.
+  - From a question, as above: `/horizon-scanner:horizon-paper "…"`.
   - From a table you already curated in the web app's Paper Studio: use the plan id
-    with `/horizon-paper --plan <id>`.
+    with `/horizon-scanner:horizon-paper --plan <id>`.
 
 ---
 
@@ -100,9 +100,9 @@ Horizon Scanner Library.
 
 | You see | What to do |
 |---|---|
-| *"run /horizon-login first"* | You skipped Step 2 — run `/horizon-login <your key>` (copy it again from the app's "Set up Claude Code"). |
-| A **401 / unauthorized** error | Your key was revoked or replaced — get a fresh one from the app and run `/horizon-login` again. |
-| `/horizon-paper` isn't recognized | The plugin didn't install — re-run the two `/plugin …` lines from Step 2. |
+| *"run /horizon-scanner:horizon-login first"* | You skipped Step 2 — run `/horizon-scanner:horizon-login <your key>` (copy it again from the app's "Set up Claude Code"). |
+| A **401 / unauthorized** error | Your key was revoked or replaced — get a fresh one from the app and run `/horizon-scanner:horizon-login` again. |
+| `/horizon-scanner:horizon-paper` isn't recognized | The plugin didn't install — re-run the two `/plugin …` lines from Step 2. |
 | It seems stuck | Large papers take a few minutes (the corpus search and drafting are real work). Give it time; if it errors, just run the command again. |
 
 Need help? Contact your Horizon Scanner administrator.

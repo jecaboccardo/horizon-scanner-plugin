@@ -45,7 +45,7 @@ export HORIZON_TENANT_ID="iadb-demo"
 
 **Terminal-first (default — no web app needed):**
 ```
-/horizon-paper "returns to schooling information interventions in Latin America"
+/horizon-scanner:horizon-paper "returns to schooling information interventions in Latin America"
 ```
 Claude retrieves the base table from the corpus, proposes grounded additions, shows
 you a **review checklist** to keep/drop them, then writes the paper.
@@ -53,12 +53,12 @@ you a **review checklist** to keep/drop them, then writes the paper.
 **From a web-curated table (optional handoff):** if you already built a table in
 Paper Studio, pass its plan id instead:
 ```
-/horizon-paper --plan <planId>
+/horizon-scanner:horizon-paper --plan <planId>
 ```
 
 Options: `--no-expand` (skip the creative-planner additions), `--out <path>` (output file).
 
-The finished paper is written to `./horizon-paper-<id>.md`. You can upload it back
+The finished paper is written to `./horizon-scanner:horizon-paper-<id>.md`. You can upload it back
 into the Horizon Scanner Library, or keep it locally.
 
 ## What it talks to (both read-only, golden-rule-safe — never write the corpus)
