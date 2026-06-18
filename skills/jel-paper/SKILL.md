@@ -65,8 +65,15 @@ Be candid about evidence quality and gaps. No marketing language, no hedging fil
 
 ## Output
 Return clean Markdown: `# Title`, an abstract paragraph, `##` section headings,
-prose with inline `[workId]` citations, and the evidence table at the end. Do not
-wrap the whole thing in a code fence.
+prose, and the Works Cited table at the end. Do not wrap the whole thing in a code fence.
+
+🔑 **The `[workId]` tag is an internal citation fence, not for the reader.** Use it inline while you
+draft and self-check (it proves every claim cites an in-set work and builds the Works Cited table), but
+in the **final reader-facing prose** a citation must read as **`Author (year)`** only — strip every inline
+`[workId]` tag before you emit the paper (delete the tag and the space before it: `\s*\[[^\]]{3,}\]` → ``).
+The DOI appears **once, in the Works Cited table** (whose `https://doi.org/…` URLs are not bracketed, so
+stripping never touches them). When run via `/horizon-scanner:horizon`, that command does the stripping at
+export time — defer to it.
 
 ## Self-check before finishing
 - Every `[workId]` you used exists in the evidence set. (Grep your draft's workIds

@@ -125,6 +125,13 @@ theme, cite only papers relevant + credible to each section (cite-what-matters),
 match each study's rigor." Then draft, printing ▶ "Drafting: <section heading>…" before each section.
 Obey the citation fence — only cite a real `[workId]` from the final set, as `Author (year) [workId]`.
 
+🔑 **The `[workId]` tag is an INTERNAL citation fence, NOT for the reader.** Keep it inline *while you
+draft and self-review* — it is how you (and the quality passes) verify every claim cites an in-set work
+and how you build the Works Cited table. But it **MUST NOT appear in the final files** the user opens:
+in the reader-facing prose a citation reads as **`Author (year)`** only, with the DOI appearing **just
+once, in the Works Cited table**. You strip the tags at export time (Step 9) — do not strip them while
+drafting, or the fence and the Works Cited build both break.
+
 **Footer = Works Cited only.** Do NOT append a full all-papers evidence table. The paper ends with a
 **Works Cited** table containing ONLY the papers you actually cited, columns:
 `#, Authors (Year), Title, Method, SMS, DOI`.
@@ -156,7 +163,18 @@ rest were off-topic or redundant and omitted."
 
 ## Step 9 — Save as Word + Excel
 ▶ "Exporting to Word and Excel…". Produce three files next to `--out` (default base `./horizon-paper-<PLAN_ID>`):
-1. **`<base>.md`** — always write this first (the source of truth; never fails).
+
+🔑 **STRIP the citation-fence tags from the prose first.** Before writing any file, remove every inline
+`[workId]` tag from the body prose so a citation reads as **`Author (year)`** alone — the reader never
+sees a bracketed DOI/workId next to a name. Apply the same rule the app uses: delete each tag and the one
+space before it (regex `\s*\[[^\]]{3,}\]` → ``). This touches **prose only** — the **Works Cited table is
+untouched** (its DOIs are full `https://doi.org/…` URLs, not bracketed tags, so the regex never matches
+them). Do the stripping in the Python/export step on the markdown string, AFTER the self-review has used
+the tags to verify claims and AFTER you have built the Works Cited table from them. (The web app does
+exactly this at render and download time — the plugin must match it.)
+
+1. **`<base>.md`** — always write this first (the source of truth; never fails). Write the **tag-stripped**
+   prose + the Works Cited table.
 2. **`<base>.docx`** (Word) — convert the paper. Prefer `pandoc "<base>.md" -o "<base>.docx"` if pandoc
    is on PATH; else run a short Python script with **python-docx** (`pip install --quiet python-docx` if
    missing) that writes the title as Heading 0, `##` sections as Heading 1, paragraphs as body text, and

@@ -6,6 +6,14 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.5.5
+- **Citations no longer show the internal `[workId]`/DOI tag inline.** Reader-facing prose now
+  reads `Author (year)` — the bracketed fence tag (e.g. `Jensen (2010) [10.1162/qjec.2010.125.2.515]`)
+  is stripped from the final `.md`/`.docx` at export time, exactly as the web app does at render/download.
+  The tag is still used *during drafting + self-review* (it proves every claim cites an in-set work and
+  builds the Works Cited table) — it just never reaches the files the user opens; the DOI appears once,
+  in the Works Cited table. Updated `commands/horizon.md` (Steps 7 + 9) and `skills/jel-paper/SKILL.md`.
+
 ## 0.5.4
 - **First-run welcome in the terminal (no manual needed).** A `SessionStart` hook
   (`hooks/hooks.json` → `scripts/welcome.mjs`) prints a one-time, login-aware tip: if not
