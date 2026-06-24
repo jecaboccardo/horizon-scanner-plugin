@@ -68,22 +68,25 @@ Claude narrates each step as it goes (you'll see a `▶` line before each), so y
 know what's happening.
 
 ### What you'll see
-1. **A few clarifying questions** — like the web app: region, population focus, evidence
-   type (causal/foundational), recency, which sources to prioritize, and paper length.
-   Each has a sensible default — reply **"defaults"** to accept, or adjust a few.
-   (Add `--no-clarify` to skip and use defaults.)
+1. **A few clarifying questions, one at a time** — like the web app: region, population focus,
+   evidence type (causal/foundational), recency, which sources to prioritize, and paper length.
+   Each is asked in turn with a sensible default — reply **"defaults"** at any point to accept that
+   one and all the rest, or adjust a few. (Add `--no-clarify` to skip and use defaults.)
 2. **Searching the corpus** — Claude retrieves the most relevant papers with your filters and
    lists them.
 3. **Suggested additions** — Claude proposes important/seminal papers that might be missing;
    each is verified against the real corpus (nothing is invented).
-4. **Your review** — Claude shows the additions and asks which to keep (reply with numbers to
-   drop, or **"all"** / **"none"**).
+4. **Your review (one round)** — Claude shows the full evidence table (base + suggestions) and you
+   can, in one reply: **remove** papers (by number), ask Claude to **find a specific paper in the
+   corpus** (name it by title/author — it's verified against the real corpus), or **upload your own**
+   paper that isn't in the corpus (paste a DOI or citation — flagged "unverified"). Claude then shows
+   the final set before writing.
 5. **Writing** — the paper is drafted in front of you, section by section, with citations.
 6. **What was used** — at the end Claude shows **only the papers actually cited** and explains
    how they were selected (relevance + credibility), rather than the whole pool.
-7. **Saved** — you get the paper as **Word** (`horizon-paper-….docx`) and the citations as
-   **Excel** (`horizon-paper-…-citations.xlsx`), plus a `.md` source copy. The paper ends with a
-   **Works Cited** list of just the papers used (no full pool table).
+7. **Saved** — you get the paper as **Word** (`horizon-paper-….docx`) and the **full evidence table**
+   as **Excel** (`horizon-paper-…-evidence.xlsx`, one row per paper with a Cited column + abstracts),
+   plus a `.md` source copy. The paper itself ends with a **Works Cited** list of just the papers used.
 
 Open the Word file to read or share it. You can also upload it back into the Horizon Scanner Library.
 

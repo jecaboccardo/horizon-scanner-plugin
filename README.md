@@ -58,14 +58,16 @@ Paper Studio, pass its plan id instead:
 
 Options: `--no-expand` (skip the creative-planner additions), `--out <path>` (output file).
 
-The finished paper is written to `./horizon-paper-<id>.md` (plus `.docx` and a citations `.xlsx`). You can upload it back
-into the Horizon Scanner Library, or keep it locally.
+The finished paper is written to `./horizon-paper-<id>.md` (plus `.docx` and a full evidence-table `.xlsx`).
+You can upload it back into the Horizon Scanner Library, or keep it locally.
 
-## What it talks to (both read-only, golden-rule-safe — never write the corpus)
+## What it talks to (golden-rule-safe — never writes the corpus)
 
-- `GET  /api/paper-plans/:id/bundle` — the curated evidence + plan north-star.
+- `GET  /api/paper-plans/:id/bundle` — the curated evidence + plan north-star (read-only).
 - `POST /api/paper-plans/:id/ground` — corroborate your proposed additions against
-  the corpus (no server-side LLM; the proposing happens in your Claude Code).
+  the corpus (read-only; no server-side LLM; the proposing happens in your Claude Code).
+- `POST /api/paper-plans/:id/uploads` — attach a paper of your own that isn't in the corpus
+  (writes `plan.uploads` + an upload signal only — **never** the `works` corpus; flagged unverified).
 - `GET  /api/generation-spec` — the live JEL writing contract (same single source the
   server's own drafter uses), so the plugin's output tracks the pipeline automatically.
 
