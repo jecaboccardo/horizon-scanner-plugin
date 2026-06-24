@@ -6,6 +6,11 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.6.0
+- Clarifier now asks scope questions ONE AT A TIME (region → population → evidence → recency → sources → length), with a `defaults` escape — parity with the web app.
+- Evidence gate: a single review round shows the full table, then accepts remove / find-in-corpus (grounded) / upload-your-own-paper edits before drafting. Step 3 no longer prints a separate base table — the evidence is shown once, in the gate.
+- Export: the spreadsheet is now the FULL evidence table (app columns + Abstract + a Cited flag), not cited-only. Uploaded papers appear as rows flagged unverified.
+
 ## 0.5.5
 - **Citations no longer show the internal `[workId]`/DOI tag inline.** Reader-facing prose now
   reads `Author (year)` — the bracketed fence tag (e.g. `Jensen (2010) [10.1162/qjec.2010.125.2.515]`)
