@@ -6,6 +6,11 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.6.1
+- Clarifier marks each dimension's default `(recommended)` and lists options with the recommended one first.
+- After the six questions (or a `defaults` accept), the clarifier prints a single consolidated SUMMARY of all choices (`Dimension · Your choice · Maps to`) + working question + target length before retrieving — matching the web app's one-at-a-time → summarize flow.
+- Server (not auto-synced; needs deploy): the plugin-key allowlist now permits `PATCH /api/paper-plans/:id`, scoped to evidence-curation fields only (`curatedWorkIds`/`discoveredWorkIds`/`removedWorkIds`), so accepted grounded/uploaded additions can be persisted to the plan (bundle + server-side regeneration then reflect them).
+
 ## 0.6.0
 - Clarifier now asks scope questions ONE AT A TIME (region → population → evidence → recency → sources → length), with a `defaults` escape — parity with the web app.
 - Evidence gate: a single review round shows the full table, then accepts remove / find-in-corpus (grounded) / upload-your-own-paper edits before drafting. Step 3 no longer prints a separate base table — the evidence is shown once, in the gate.

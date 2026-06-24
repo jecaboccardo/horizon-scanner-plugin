@@ -34,15 +34,22 @@ and `x-tenant-id: $HORIZON_TENANT_ID`. On 401, tell them the key may be revoked 
 ▶ "Let me confirm a few things to focus the search."
 
 Ask the SIX dimensions **ONE AT A TIME — one question per message**, mirroring the web app's
-chat-style clarifier. For EACH dimension: print the dimension name, its **detected default**
-(pre-fill from hints in the question, e.g. "Latin America" → Region = LAC), and the concrete
-options; then **WAIT for the reply before asking the next**. NEVER batch them into one message.
-NEVER silently apply a default without showing it. You MUST ask **#4 Recency** and **#5 Sources**
-explicitly (spelling out the default source set) — these are the most often wrongly skipped.
+chat-style clarifier. For EACH dimension: print the dimension name, its **detected default marked
+`(recommended)`** (pre-fill from hints in the question, e.g. "Latin America" → Region = LAC), and
+the concrete options as a short list with the recommended one first; then **WAIT for the reply
+before asking the next**. NEVER batch them into one message. NEVER silently apply a default without
+showing it. You MUST ask **#4 Recency** and **#5 Sources** explicitly (spelling out the default
+source set) — these are the most often wrongly skipped.
 
 **`defaults` escape:** at ANY question, if the user replies `defaults`, accept THAT dimension and
-ALL REMAINING dimensions at their detected defaults, and proceed straight to retrieval. (It does
+ALL REMAINING dimensions at their detected defaults, and proceed straight to the summary. (It does
 NOT change dimensions already answered.) `--no-clarify` still skips the whole sequence.
+
+**After all six are answered (or `defaults` is accepted), SUMMARIZE before retrieving — HARD RULE.**
+Print a single consolidated recap so the user confirms the whole profile at a glance: a compact
+table with columns **`# · Dimension · Your choice · Maps to`** for all six, plus the **working
+question** and the **target length** ("Targeting ~5,000 words / ~10 pages"). This mirrors the
+one-question-at-a-time → summary flow of the web app's clarifier. Then proceed to Step 2.
 
 1. **Region** — *default:* `<detected, else No preference>`. Options: LAC · a specific other region (USA & Canada · Europe & Central Asia · Sub-Saharan Africa · South & SE Asia · MENA) · No preference.
 2. **Population focus** — *default:* none. Options: children · adolescents · adults · women/girls · rural · urban · low-income · none.
