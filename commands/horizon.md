@@ -81,7 +81,8 @@ Take the plan `id`.
 `GET /api/paper-plans/$PLAN_ID/bundle` → `{ workingQuestion, emphasis, evidence[] }`. Each row has
 `workId, title, authors[], year, smsLevel, methodology, geography[], abstract, doi (canonical DOI or null),
 citationCount, venue`. **Keep the `doi` field** — it's required for the references/citations below.
-Show the user a numbered table of the base evidence with columns **# · Authors · Year · Venue · Title · SMS** — the bundle carries `venue` and `year` for every row, so ALWAYS include them (never drop venue/year).
+Hold this resolved evidence — do NOT print a table here. The user sees the evidence ONCE, in the
+Step 5 gate (base + suggestions together). Just confirm count: ▶ "Resolved N papers with full metadata."
 
 ## Step 4 — Creative-planner additions (unless `--no-expand`)
 ▶ "Now I'll propose seminal/relevant papers the table may be missing, then verify each one against the corpus (nothing fabricated)…"
