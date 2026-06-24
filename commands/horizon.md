@@ -33,19 +33,21 @@ and `x-tenant-id: $HORIZON_TENANT_ID`. On 401, tell them the key may be revoked 
 ## Step 1 — Clarify the search (unless `--no-clarify` or `--plan`)
 ▶ "Let me confirm a few things to focus the search."
 
-Show ALL SIX dimensions as a numbered checklist in ONE message. **HARD RULES — do not violate:**
-for EVERY dimension you MUST print its default AND the concrete alternative options, so the user
-makes an *informed* choice. NEVER skip a dimension. NEVER silently apply defaults without showing
-them. In particular you MUST always show **#4 Years/recency** and **#5 Sources** (spelling out the
-actual default source set) — these are the ones most often wrongly skipped. Detect hints from the
-question and pre-fill the default (e.g. "Latin America" → Region = LAC), but still display every
-dimension. End the message with: *"Reply `defaults` to accept all, or tell me what to change."*
-Then **WAIT** for the reply before retrieving — do not proceed on your own.
+Ask the SIX dimensions **ONE AT A TIME — one question per message**, mirroring the web app's
+chat-style clarifier. For EACH dimension: print the dimension name, its **detected default**
+(pre-fill from hints in the question, e.g. "Latin America" → Region = LAC), and the concrete
+options; then **WAIT for the reply before asking the next**. NEVER batch them into one message.
+NEVER silently apply a default without showing it. You MUST ask **#4 Recency** and **#5 Sources**
+explicitly (spelling out the default source set) — these are the most often wrongly skipped.
+
+**`defaults` escape:** at ANY question, if the user replies `defaults`, accept THAT dimension and
+ALL REMAINING dimensions at their detected defaults, and proceed straight to retrieval. (It does
+NOT change dimensions already answered.) `--no-clarify` still skips the whole sequence.
 
 1. **Region** — *default:* `<detected, else No preference>`. Options: LAC · a specific other region (USA & Canada · Europe & Central Asia · Sub-Saharan Africa · South & SE Asia · MENA) · No preference.
 2. **Population focus** — *default:* none. Options: children · adolescents · adults · women/girls · rural · urban · low-income · none.
 3. **Evidence type** — *default:* both. Options: Causal (RCT/DiD/IV/RDD) · Foundational (seminal / high-cite) · both.
-4. **Years / recency** — *default:* All years. Options: **Recent frontier (2020+)** · **From 2000 onwards** · **All years**. (ALWAYS ask — never assume the year range.)
+4. **Recency** — *default:* All years. Options: **Recent frontier (2020+)** · **From 2000 onwards** · **All years**. (ALWAYS ask — never assume the year range.)
 5. **Sources** — *default:* the standard set, which you MUST spell out every time: **journals ABS 3+ · institutions IADB, World Bank, IMF, OECD · working papers NBER, IZA, CEPR/RePEc, SSRN**. Options: accept that default, OR choose specific journal tiers / repositories / document types (journal articles · working papers · reports & grey-lit · books). (ALWAYS show the default set AND offer to change it — never just say "using defaults".)
 6. **Paper length** — *default:* Standard (~20 pages / ~10,000 words). Options: Brief (~10pg / ~5,000w) · Standard · Custom (give a word/page count).
 
@@ -92,28 +94,35 @@ curl -sS -X POST "$HORIZON_API_BASE/api/paper-plans/$PLAN_ID/ground" -H "Authori
 ```
 Report what verified vs evaporated.
 
-## Step 5 — REVIEW GATE (always)
-The user decided on additions several screens after the base table scrolled away, so **re-show
-BOTH together** for an informed decision — never present additions in isolation:
-1. **Recap the base evidence table** (the papers already in the set from Step 3) — compact: `#`,
-   Authors (Year), short title, SMS. A first-timer needs to see "what do I already have?" to judge
-   whether an addition is new or redundant.
-2. **Then the proposed additions** as a keep/drop checklist, and for EACH addition flag whether it's
-   on-topic vs merely adjacent to the question (the grounding can surface same-keyword-but-different-
-   literature papers — e.g. for an *information-intervention* question it may pull in *returns-
-   estimation* papers). Help the user judge; don't just list them.
-3. Note any genuinely-relevant work that was found but cut as `over_cap`, so the user can opt to keep it.
+## Step 5 — Evidence gate (always; single round)
+Run ONE review gate before drafting. Show base retrieved + planner-suggested papers **together**
+as ONE numbered table — columns **`# · Authors (Year) · Venue · Title · Source`** (Source =
+`📚 retrieved` / `➕ suggested`). **No SMS/Method columns here** — keep it scannable for the decision.
+For each `➕ suggested` row, flag on-topic vs merely-adjacent (grounding can surface
+same-keyword-different-literature papers). Note any `over_cap` finds the user could keep.
 
-Then **wait** for the user: "Keep all? Reply with numbers to DROP, or all / none."
-Apply their choice, then **show the FINAL evidence table** — this is a HARD RULE, not optional: the
-complete definitive set the paper will draw from (base retrieved + kept additions), as ONE numbered
-table with columns **# · Authors (Year) · Venue · Title · SMS · Source** (Source = `📚 retrieved` or
-`➕ added`). The user MUST see every paper — with its title, venue, and year — before drafting, not
-just a count. Then confirm "Drafting over N papers."
+Then prompt ONCE for a batch of edits (the user may combine any of these in one reply):
+- **Remove** — "drop 3, 7, 12": remove those rows from the working set (they are simply not passed to generation).
+- **Find in corpus** — "add Jensen 2010 perceived returns; add Duflo teacher incentives": build a
+  `namedWorks` array from these and call `/ground` (the Step 4 curl) — the ONLY way to add a corpus
+  paper. Report which verified (added) vs not-in-corpus.
+- **Upload my own** — "upload 10.1162/… " or a pasted citation/abstract of a paper NOT in the corpus:
+  call **`POST /api/paper-plans/$PLAN_ID/uploads`** — first WITHOUT `confirm` to preview, then with
+  `{"confirm":true,"uploadId":"<from preview>"}` to attach. These attach to `plan.uploads`, flagged
+  **user-supplied · unverified**. (🔒 never writes the corpus.)
+  ```bash
+  curl -sS -X POST "$HORIZON_API_BASE/api/paper-plans/$PLAN_ID/uploads" \
+    -H "Authorization: Bearer $HORIZON_API_TOKEN" -H "x-tenant-id: $HORIZON_TENANT_ID" \
+    -H "Content-Type: application/json" -d '{"doiOrUrl":"<doi-or-url>"}'   # or {"pastedText":"<citation>"}
+  ```
+
+Apply ALL edits, then **show the FINAL table once** — HARD RULE — the complete set the paper draws
+from, columns **`# · Authors (Year) · Venue · Title · Source`** (Source = `📚 retrieved` / `➕ added` /
+`⬆ uploaded · unverified`). Then confirm "Drafting over N papers." If the user gave no edits, proceed.
 
 ▶ **Before generating, tell the user what they'll receive:** "I'll now write the paper (~<target> words).
-You'll get a **Word document (.docx)** of the paper and an **Excel spreadsheet (.xlsx)** of the cited
-evidence table, plus a Markdown source copy."
+You'll get a **Word document (.docx)** of the paper and an **Excel spreadsheet (.xlsx)** of the full
+evidence table (with a Cited column), plus a Markdown source copy."
 
 ## Step 6 — Fetch the writing contract
 ▶ "Fetching the current writing standard so this matches the live pipeline…"
@@ -179,11 +188,22 @@ exactly this at render and download time — the plugin must match it.)
    is on PATH; else run a short Python script with **python-docx** (`pip install --quiet python-docx` if
    missing) that writes the title as Heading 0, `##` sections as Heading 1, paragraphs as body text, and
    the Works Cited table as a real Word table.
-3. **`<base>-citations.xlsx`** (Excel) — the Works Cited table via a short Python script using **openpyxl**
-   (`pip install --quiet openpyxl` if missing): one sheet "Works Cited", header row + one row per cited
-   paper (`#, Authors (Year), Title, Method, SMS, DOI`), using the same DOI rule as the prose footer.
+3. **`<base>-evidence.xlsx`** (Excel) — the **FULL evidence table** (one row per paper in the final
+   set, NOT cited-only) via a short Python script using **openpyxl** (`pip install --quiet openpyxl`
+   if missing). One sheet "Evidence", header row + one row per paper, columns mirroring the web app's
+   evidence export **plus Abstract**:
+   `Ref · Cited · WorkID · Title · Authors · Year · Region · Source · Type · Methodology · SMS ·
+   ABSRating · RePEcPercentile · CitationCount · DOI · URL · Unverified · Abstract`
+   - `Cited` = "yes" if the paper's workId appears in the drafted prose's citation fence, else "no".
+   - `Region` = derived from the row's `geography[]` (use the LAC/region rollup token if present, else
+     the first geography entry, else "—").
+   - `Source` = `venue` (or `sourceFamily` if venue is null). `Type` = `methodology`. `SMS` = `smsLevel`.
+   - `ABSRating`/`RePEcPercentile`/`URL` from the bundle fields (empty if null — never block).
+   - `DOI` = `doi` → `https://doi.org/<doi>`; else `10.`-workId → doi.org; else `—` (same rule as prose).
+   - `Unverified` = "yes" for uploaded (user-supplied) rows, else "no".
+   - Uploaded papers (`plan.uploads` / the upload previews collected in Step 5) are INCLUDED as rows.
 
 **Fallbacks (never block the user):** if neither pandoc nor python-docx can produce the .docx, keep the
-`.md` and say so. If openpyxl is unavailable, write `<base>-citations.csv` instead (Excel opens it natively)
+`.md` and say so. If openpyxl is unavailable, write `<base>-evidence.csv` instead (Excel opens it natively)
 and say so. Print every file path produced, and note: this ran entirely on the user's Claude subscription —
 no web-app AI spend.
