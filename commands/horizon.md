@@ -110,7 +110,18 @@ For each `➕ suggested` row, flag on-topic vs merely-adjacent (grounding can su
 same-keyword-different-literature papers). Note any `over_cap` finds the user could keep.
 
 Then prompt ONCE for a batch of edits (the user may combine any of these in one reply):
-- **Remove** — "drop 3, 7, 12": remove those rows from the working set (they are simply not passed to generation).
+- **Remove** — "drop 3, 7, 12": remove those rows from the working set (not passed to generation). **For
+  each dropped paper, ask ONCE: "just this paper, or hide it from all similar future searches?"** (a quick
+  batch question is fine: "Drop for this paper only, or also hide from similar future searches?").
+  - *This paper only* (default) → just exclude it here; no feedback call.
+  - *All similar searches* → ALSO record a dislike so it's suppressed on future cosine-similar queries
+    (same as a thumbs-down in the web evidence table), passing `searchRunId` = the `$RUN_ID` from Step 2:
+    ```bash
+    curl -sS -X POST "$HORIZON_API_BASE/api/feedback" -H "Authorization: Bearer $HORIZON_API_TOKEN" \
+      -H "x-tenant-id: $HORIZON_TENANT_ID" -H "Content-Type: application/json" \
+      -d '{"workId":"<WORK_ID>","type":"dislike","searchRunId":"<RUN_ID>"}'
+    ```
+    (In `--plan` mode there's no run id — omit `searchRunId`; the suppression just won't be recorded.)
 - **Find in corpus** — "add Jensen 2010 perceived returns; add Duflo teacher incentives": build a
   `namedWorks` array from these and call `/ground` (the Step 4 curl) — the ONLY way to add a corpus
   paper. Report which verified (added) vs not-in-corpus.
@@ -215,3 +226,23 @@ exactly this at render and download time — the plugin must match it.)
 `.md` and say so. If openpyxl is unavailable, write `<base>-evidence.csv` instead (Excel opens it natively)
 and say so. Print every file path produced, and note: this ran entirely on the user's Claude subscription —
 no web-app AI spend.
+
+## Step 10 — Rate the papers (optional; teaches the corpus your preferences)
+▶ "Optional: rate any papers so Horizon Scanner learns which study designs you value."
+This is **opt-in and skippable** — if the user isn't interested, skip it and finish. Explain in one
+line: "Your ratings feed a per-user learning loop — over time, methodologies you mark useful are
+nudged higher in YOUR future searches (it never changes anyone else's results)."
+
+Prompt ONCE for a batch (the user may reply `skip`): e.g. "useful: 2, 5, 9 · not useful: 7". Map each
+to a feedback call, using the **corpus `workId`** for that row (skip `⬆ uploaded · unverified` rows —
+they aren't in the corpus, so the learning loop can't use them). **Always pass `searchRunId` = the
+`$RUN_ID` from Step 2** (omit it only in `--plan` mode, where there's no run) — without it the server
+can't tie the rating to this query, so the per-query learning won't fire:
+```bash
+curl -sS -X POST "$HORIZON_API_BASE/api/feedback" -H "Authorization: Bearer $HORIZON_API_TOKEN" \
+  -H "x-tenant-id: $HORIZON_TENANT_ID" -H "Content-Type: application/json" \
+  -d '{"workId":"<WORK_ID>","type":"like","searchRunId":"<RUN_ID>"}'  # like|save = useful ; dislike|dismiss = not
+```
+Send one call per rated paper. (Papers you ADDED in the Step 5 gate are already recorded as positive
+signals server-side — no action needed here.) Report a one-line summary ("Recorded 3 useful, 1 not —
+thanks; this sharpens your future searches."). A failure here never blocks anything you already saved.

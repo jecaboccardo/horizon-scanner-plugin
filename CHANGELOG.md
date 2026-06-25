@@ -6,6 +6,18 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.6.4
+- Step 5 evidence gate: when you drop a paper, the assistant now asks whether it's **just for this paper** or **also hide it from all similar future searches**. "All similar" records a dislike (with `searchRunId`) → the paper is suppressed on future cosine-similar queries, exactly like a thumbs-down in the web evidence table.
+- Server (not auto-synced; needs deploy): `POST /api/feedback` now also accepts a direct `queryText` (in addition to `searchRunId`/`briefId`) so the query can be attached to a feedback row from any surface.
+
+## 0.6.3
+- Step 10 "Rate the papers" now sends `searchRunId` with each rating so the server can tie it to the query → feeds the per-query learning (both the positive promote boost and the dislike suppression), not just the methodology-weight agent.
+- Server (not auto-synced; needs deploy): positive per-query learning — papers liked/saved/added on a similar past query get a bounded, relevance-gated rerank boost (`RB_PROMOTE_FEEDBACK=1`, default OFF). Plan additions (curated/discovered) are recorded automatically; `POST /api/feedback` now also accepts `searchRunId` and captures the query for like/save (not just dislike).
+
+## 0.6.2
+- New optional **Step 10 — Rate the papers**: after the paper is saved, the user can mark cited papers useful / not useful. Ratings post to `POST /api/feedback` (now in the plugin-key allowlist) and feed the per-user learning loop, which nudges study designs the user values higher in THEIR future searches (never affects other users). Fully opt-in and skippable; uploaded/unverified rows are skipped (not in the corpus).
+- Server (not auto-synced; needs deploy): the plugin-key allowlist now permits `POST /api/feedback`; retrieval closes the learning-agent loop — approved `domain_weights` become a bounded methodology-domain rerank boost under `RB_DOMAIN_WEIGHTS=1`.
+
 ## 0.6.1
 - Clarifier marks each dimension's default `(recommended)` and lists options with the recommended one first.
 - After the six questions (or a `defaults` accept), the clarifier prints a single consolidated SUMMARY of all choices (`Dimension · Your choice · Maps to`) + working question + target length before retrieving — matching the web app's one-at-a-time → summarize flow.
