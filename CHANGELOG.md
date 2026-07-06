@@ -6,6 +6,13 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.6.5
+- **Generation now matches the web pipeline, not just its writing rules.** The plugin already fetched the shared writing contract (`/api/generation-spec`); this release operationalizes the two pipeline stages it was skipping:
+  - **Step 6b — evidence segmentation (Core / Context / Off):** applies the spec's segmentation policy (the plugin analog of the server's topicality tierer) — derive the core topic (strip geography/time/population), tier every paper, build the argument on Core, use Context for framing, never cite Off as core evidence. Adds a `Tier` column to the Excel export and orders rows Core → Context → Off, mirroring the app's evidence table.
+  - **Step 6c — evidence enrichment (web):** the plugin analog of the server's work-dossiers — for the top Core papers it will cite, recover that paper's own effect sizes/identification the abstract omits, under the spec's hard name-match + hedge rules. Added `WebSearch` to the command's allowed-tools (the enrichment policy calls for web search; the command previously granted only `WebFetch`).
+- **Paper length now matches the web app exactly.** The clarifier offered Brief ~10pg/5,000w and a *default* Standard ~20pg/10,000w — but the web app only produces 5 or 10 pages (500 words/page, default 10). Fixed to Brief (~5pg / ~2,500w) · Standard (~10pg / ~5,000w, recommended) · Custom.
+- **New Step 5b — curation is persisted to the plan.** After the evidence gate, the assistant PATCHes `discoveredWorkIds` (kept grounded additions) and `removedWorkIds` (dropped papers) back to the plan (best-effort; never blocks drafting). The plan's evidence table is now identical whether reopened in the web app's Paper Studio or regenerated server-side — closing the loop the 0.6.1 PATCH allowlist opened. (Uploads already persisted via `/uploads`; dislikes via `/feedback`.)
+
 ## 0.6.4
 - Step 5 evidence gate: when you drop a paper, the assistant now asks whether it's **just for this paper** or **also hide it from all similar future searches**. "All similar" records a dislike (with `searchRunId`) → the paper is suppressed on future cosine-similar queries, exactly like a thumbs-down in the web evidence table.
 - Server (not auto-synced; needs deploy): `POST /api/feedback` now also accepts a direct `queryText` (in addition to `searchRunId`/`briefId`) so the query can be attached to a feedback row from any surface.

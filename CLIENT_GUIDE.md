@@ -81,11 +81,13 @@ know what's happening.
    corpus** (name it by title/author — it's verified against the real corpus), or **upload your own**
    paper that isn't in the corpus (paste a DOI or citation — flagged "unverified"). Claude then shows
    the final set before writing.
-5. **Writing** — the paper is drafted in front of you, section by section, with citations.
-6. **What was used** — at the end Claude shows **only the papers actually cited** and explains
+5. **Tiering & deepening** — Claude tiers the evidence (Core / Context / Off, like the web app) and, for
+   the Core papers, looks up effect sizes the abstracts leave out (verified against each paper by name).
+6. **Writing** — the paper is drafted in front of you, section by section, with citations.
+7. **What was used** — at the end Claude shows **only the papers actually cited** and explains
    how they were selected (relevance + credibility), rather than the whole pool.
-7. **Saved** — you get the paper as **Word** (`horizon-paper-….docx`) and the **full evidence table**
-   as **Excel** (`horizon-paper-…-evidence.xlsx`, one row per paper with a Cited column + abstracts),
+8. **Saved** — you get the paper as **Word** (`horizon-paper-….docx`) and the **full evidence table**
+   as **Excel** (`horizon-paper-…-evidence.xlsx`, one row per paper with Cited + Tier columns + abstracts),
    plus a `.md` source copy. The paper itself ends with a **Works Cited** list of just the papers used.
 
 Open the Word file to read or share it. You can also upload it back into the Horizon Scanner Library.
@@ -97,7 +99,7 @@ Open the Word file to read or share it. You can also upload it back into the Hor
 - **Everything stays grounded in the evidence.** Claude can only cite papers that
   are actually in the Horizon Scanner corpus — it won't fabricate studies or
   findings.
-- **You're in control of the evidence.** The review step (3 above) lets you keep or
+- **You're in control of the evidence.** The review step (4 above) lets you keep or
   drop the suggested additions before the paper is written.
 - **Cost.** Generating the paper uses your own Claude subscription — it isn't billed
   to Horizon Scanner.

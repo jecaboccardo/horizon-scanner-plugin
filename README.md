@@ -15,7 +15,7 @@ Everything can happen in the terminal — no web round-trip required.
 
 | Step | Where it runs | Who pays |
 |------|---------------|----------|
-| Retrieve the base evidence table from the 488k-paper corpus | Horizon Scanner server (read-only, no LLM) | — |
+| Retrieve the base evidence table from the ~500K-paper corpus | Horizon Scanner server (read-only, no LLM) | — |
 | Propose missing seminal works / sub-literatures | **Your Claude Code** | Your subscription |
 | Corroborate those proposals vs the corpus | Horizon Scanner server (read-only) | — |
 | Review which additions to keep | You (a checklist in the terminal) | — |
@@ -36,7 +36,7 @@ but only papers that resolve to a real corpus row can be added or cited — no f
 Export your Horizon Scanner credentials (get them from the web app → account):
 
 ```bash
-export HORIZON_API_BASE="https://horizon-api.nextminder.com"   # or http://localhost:3002
+export HORIZON_API_BASE="https://<YOUR_DENO_API_URL>"   # or http://localhost:3002
 export HORIZON_API_TOKEN="<your access token>"
 export HORIZON_TENANT_ID="iadb-demo"
 ```

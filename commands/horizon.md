@@ -1,7 +1,7 @@
 ---
 description: Build an evidence table from the Horizon Scanner corpus and write a JEL survey paper — entirely in your terminal, on your own Claude subscription. Asks clarifying questions, narrates each step, and saves the paper + a citations table.
 argument-hint: <your research question — plain text, no quotes>  |  --plan <planId>  [--no-expand] [--no-clarify] [--out <path>]
-allowed-tools: Bash, Read, Write, WebFetch
+allowed-tools: Bash, Read, Write, WebFetch, WebSearch
 ---
 
 You are the **Horizon Scanner** paper generator, running locally on the user's own
@@ -56,7 +56,7 @@ one-question-at-a-time → summary flow of the web app's clarifier. Then proceed
 3. **Evidence type** — *default:* both. Options: Causal (RCT/DiD/IV/RDD) · Foundational (seminal / high-cite) · both.
 4. **Recency** — *default:* All years. Options: **Recent frontier (2020+)** · **From 2000 onwards** · **All years**. (ALWAYS ask — never assume the year range.)
 5. **Sources** — *default:* the standard set, which you MUST spell out every time: **journals ABS 3+ · institutions IADB, World Bank, IMF, OECD · working papers NBER, IZA, CEPR/RePEc, SSRN**. Options: accept that default, OR choose specific journal tiers / repositories / document types (journal articles · working papers · reports & grey-lit · books). (ALWAYS show the default set AND offer to change it — never just say "using defaults".)
-6. **Paper length** — *default:* Standard (~20 pages / ~10,000 words). Options: Brief (~10pg / ~5,000w) · Standard · Custom (give a word/page count).
+6. **Paper length** — *default:* Standard (~10 pages / ~5,000 words) `(recommended)`. Options: Brief (~5pg / ~2,500w) · Standard · Custom (give a word/page count). (Matches the web app's length options exactly — the app offers 5 or 10 pages at 500 words/page, default 10.)
 
 Wait for their reply, then map to the request body:
 - Region → `filters.regions` (e.g. `["LAC"]`); No preference → omit.
@@ -64,10 +64,10 @@ Wait for their reply, then map to the request body:
 - Evidence type → top-level `channels` (`"causal"` and/or `"foundational"`).
 - Recency → `filters.timePeriod` = `"recent"` | `"2000+"` | `"all"` (and add `"recent"` to channels for the frontier option).
 - Sources → `filters.journalTiers` / `institutionalSources` / `workingPaperSources` / `publicationTypes`; defaults → omit (server applies defaults).
-- Length → remember the **target word count** (Brief≈5,000 · Standard≈10,000 · Custom=their number). You draft locally, so this just sizes your output: aim for roughly that total across the sections, scaling the number/depth of thematic sections to fit. State the target back ("Targeting ~10,000 words / ~20 pages").
+- Length → remember the **target word count** (Brief≈2,500 · Standard≈5,000 · Custom=their number; the web app uses 500 words/page). You draft locally, so this just sizes your output: aim for roughly that total across the sections, scaling the number/depth of thematic sections to fit. State the target back ("Targeting ~5,000 words / ~10 pages").
 
 ## Step 2 — Build the base evidence table from the corpus
-▶ "Retrieving the most relevant papers from the 488k-paper corpus with your filters…"
+▶ "Retrieving the most relevant papers from the ~500K-paper corpus with your filters…"
 ```bash
 curl -sS -X POST "$HORIZON_API_BASE/api/search-runs" -H "Authorization: Bearer $HORIZON_API_TOKEN" \
   -H "x-tenant-id: $HORIZON_TENANT_ID" -H "Content-Type: application/json" \
@@ -139,19 +139,64 @@ Apply ALL edits, then **show the FINAL table once** — HARD RULE — the comple
 from, columns **`# · Authors (Year) · Venue · Title · Source`** (Source = `📚 retrieved` / `➕ added` /
 `⬆ uploaded · unverified`). Then confirm "Drafting over N papers." If the user gave no edits, proceed.
 
+## Step 5b — Persist your curation to the plan (so the web app matches)
+▶ "Saving your evidence edits back to the plan…"
+Write the curation back so this plan's evidence table is IDENTICAL whether reopened in the web app's
+Paper Studio or regenerated there — the plugin and the app share one plan. **Best-effort: never block
+drafting if this fails** (you already have the set in memory). Send the CORPUS workIds only:
+- `discoveredWorkIds` = the workIds you ADDED via `/ground` and kept (the `➕ added` rows). Send the full
+  kept-add list (the PATCH replaces the array, it does not append).
+- `removedWorkIds` = the workIds you DROPPED in the gate (both base `📚` and previously-added rows).
+- Do NOT send uploads here — `⬆ uploaded` papers already persisted via `/uploads` (they live in `plan.uploads`).
+```bash
+curl -sS -X PATCH "$HORIZON_API_BASE/api/paper-plans/$PLAN_ID" -H "Authorization: Bearer $HORIZON_API_TOKEN" \
+  -H "x-tenant-id: $HORIZON_TENANT_ID" -H "Content-Type: application/json" \
+  -d '{"plan":{"discoveredWorkIds":["<kept-added-workId>","..."],"removedWorkIds":["<dropped-workId>","..."]}}'
+```
+(Plugin keys may patch only these three curation fields; each must be a string array. A non-2xx here is
+non-fatal — log ▶ "couldn't sync curation to the plan (drafting anyway)" and continue.)
+
 ▶ **Before generating, tell the user what they'll receive:** "I'll now write the paper (~<target> words).
 You'll get a **Word document (.docx)** of the paper and an **Excel spreadsheet (.xlsx)** of the full
 evidence table (with a Cited column), plus a Markdown source copy."
 
 ## Step 6 — Fetch the writing contract
 ▶ "Fetching the current writing standard so this matches the live pipeline…"
-`GET /api/generation-spec?audience=technical` → follow the returned `spec` exactly.
+`GET /api/generation-spec?audience=technical` → follow the returned `spec` exactly. The spec's
+EVIDENCE SEGMENTATION and EVIDENCE ENRICHMENT policies are the plugin's analog of the server's
+topicality segmenter + work-dossiers — Steps 6b and 6c operationalize them so this run matches the
+web pipeline's generation, not just its writing rules.
+
+## Step 6b — Segment the evidence (Core / Context / Off) — matches the server's topicality tiering
+▶ "Tiering the evidence by how directly each paper bears on the question…"
+Apply the spec's **EVIDENCE SEGMENTATION** policy to the FINAL set: derive the question's core topic
+(primary outcome + intervention/mechanism; **strip geography, time period, population** — those never
+downgrade a paper), then label each paper **Core** (studies the core outcome, any country/era) /
+**Context** (adjacent concept, useful background) / **Off** (unrelated to every key concept). Be
+generous — partial concept coverage is Context, never Off. You'll **build the argument on Core papers,
+use Context for framing, and never cite Off papers as core evidence** (they stay in the table, tiered,
+for transparency). Hold this Core/Context/Off label per workId — it drives section emphasis (Step 7)
+and the `Tier` column in the evidence export (Step 9).
+
+## Step 6c — Enrich the CORE papers you'll cite (web) — matches the server's work-dossiers
+▶ "Deepening the papers I'll lean on — recovering effect sizes/identification the abstracts omit (verified, hedged)…"
+The server builds full-text/web **dossiers** for its top CORE papers and feeds them into drafting. Do the
+equivalent here, following the spec's **EVIDENCE ENRICHMENT** rules exactly. For the **Core** papers you
+expect to cite most (cap ~10–12 to stay fast), use **WebSearch/WebFetch** to recover THAT paper's own
+reported effect sizes, sample, identification strategy, or caveats that its abstract omits:
+- **Name-match gate (HARD):** accept a number ONLY if the source explicitly names that exact paper (title, OR authors AND year) — prefer the paper itself (working-paper/published) or a review/replication that cites it by name. If unsure it's from THAT paper, do NOT use it.
+- **Hedge** every web-sourced magnitude ("the study reports approximately …") — it wasn't read from full text.
+- The number stays attributed to that paper's `[workId]`; you are DEEPENING a cited paper, never adding a new source or a free-floating fact. The citation fence is unchanged.
+Keep a short per-workId note of what you found; use it while drafting. Skip on `--no-expand` if the user wants speed.
 
 ## Step 7 — Write the paper, narrating each section
 Before drafting, ▶ explain briefly **how the evidence is being used**: "I'll organize the paper by
-theme, cite only papers relevant + credible to each section (cite-what-matters), and hedge claims to
-match each study's rigor." Then draft, printing ▶ "Drafting: <section heading>…" before each section.
-Obey the citation fence — only cite a real `[workId]` from the final set, as `Author (year) [workId]`.
+theme, build each section on the Core papers (cite-what-matters), use Context papers for framing, fold
+in the enrichment I gathered, and hedge claims to match each study's rigor." Then draft, printing
+▶ "Drafting: <section heading>…" before each section. **Build the argument on Core papers; use Context
+for background/framing; do NOT cite Off papers as core evidence.** Fold in the Step 6c enrichment notes
+(hedged, still attributed to the paper's workId). Obey the citation fence — only cite a real `[workId]`
+from the final set, as `Author (year) [workId]`.
 
 🔑 **The `[workId]` tag is an INTERNAL citation fence, NOT for the reader.** Keep it inline *while you
 draft and self-review* — it is how you (and the quality passes) verify every claim cites an in-set work
@@ -211,9 +256,11 @@ exactly this at render and download time — the plugin must match it.)
    set, NOT cited-only) via a short Python script using **openpyxl** (`pip install --quiet openpyxl`
    if missing). One sheet "Evidence", header row + one row per paper, columns mirroring the web app's
    evidence export **plus Abstract**:
-   `Ref · Cited · WorkID · Title · Authors · Year · Region · Source · Type · Methodology · SMS ·
+   `Ref · Cited · Tier · WorkID · Title · Authors · Year · Region · Source · Type · Methodology · SMS ·
    ABSRating · RePEcPercentile · CitationCount · DOI · URL · Unverified · Abstract`
    - `Cited` = "yes" if the paper's workId appears in the drafted prose's citation fence, else "no".
+   - `Tier` = the Core / Context / Off label from Step 6b (mirrors the app's evidence-table tier). Sort
+     rows Core → Context → Off, then by Ref, so the export leads with the papers the argument is built on.
    - `Region` = derived from the row's `geography[]` (use the LAC/region rollup token if present, else
      the first geography entry, else "—").
    - `Source` = `venue` (or `sourceFamily` if venue is null). `Type` = `methodology`. `SMS` = `smsLevel`.
