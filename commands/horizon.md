@@ -29,11 +29,14 @@ if [ -f "$CFG" ]; then
   HORIZON_API_BASE=$(node -e "console.log(require('$CFG').apiBase||'')" 2>/dev/null)
   HORIZON_API_TOKEN=$(node -e "console.log(require('$CFG').token||'')" 2>/dev/null)
   HORIZON_TENANT_ID=$(node -e "console.log(require('$CFG').tenantId||'')" 2>/dev/null)
+  HORIZON_OUT_DIR=$(node -e "console.log(require('$CFG').outDir||'')" 2>/dev/null)          # saved save-location preference (Step 9)
+  HORIZON_CONFIRM_OUT=$(node -e "console.log(require('$CFG').confirmOutDir===false?'0':'1')" 2>/dev/null)  # '0' = save silently
 fi
 ```
 Fall back to env vars if absent. If the token is still empty, STOP and tell the user to run
 `/horizon-scanner:horizon-login <key>`. Every API call sends `Authorization: Bearer $HORIZON_API_TOKEN`
 and `x-tenant-id: $HORIZON_TENANT_ID`. On 401, tell them the key may be revoked — re-run login.
+`HORIZON_OUT_DIR` / `HORIZON_CONFIRM_OUT` (may be empty) drive the Step 9 save location — hold them for later.
 
 ---
 
@@ -241,8 +244,33 @@ After drafting, ▶ "Selecting the works actually cited…". In the terminal sho
 chosen for on-topic relevance and credibility (causal rigor / foundational citation / recency); the
 rest were off-topic or redundant and omitted."
 
-## Step 9 — Save as Word + Excel
-▶ "Exporting to Word and Excel…". Produce three files next to `--out` (default base `./horizon-paper-<PLAN_ID>`):
+## Step 9 — Choose where to save, then export as Word + Excel
+
+### Step 9a — Resolve ONE save location and confirm it (HARD RULE — never dump files silently into a temp/scratchpad dir)
+Pick the output **folder** by this precedence:
+1. **`--out <path>`** if the user passed it → use its directory + basename verbatim; skip the prompt below (an explicit flag is its own confirmation).
+2. Else the **saved preference** `HORIZON_OUT_DIR` (from `~/.horizon-scanner/config.json`, read in Credentials), if non-empty.
+3. Else the **default** `$HOME/Documents/Horizon Scanner` (create it if missing; if there is no `Documents` folder, fall back to `$HOME/Horizon Scanner`). NEVER default to the session scratchpad/temp dir — the user can't find it.
+
+Build a **descriptive, human-readable filename base** from the paper's title/topic
+(e.g. `Gender-Based Violence and Long-Term Economic Outcomes - LAC`), NOT the raw
+`horizon-paper-<planId>`. The three files are `<folder>/<base>.md`, `<base>.docx`, `<base>-evidence.xlsx`.
+
+**Then propose exactly ONE location and get a quick OK before writing**, UNLESS `--out` was given, or the
+saved `HORIZON_CONFIRM_OUT` is `'0'` (user chose "save silently") — in those cases skip the prompt, save, and
+just report the path.
+▶ "I'll save the paper + evidence table to: `<folder>\<base>.docx` (plus `.xlsx` and `.md`). OK, or give me a different folder?"
+- If the user names a different folder, use it (expand `~`; create it if missing).
+- **If no preference is saved yet** (`HORIZON_OUT_DIR` empty), after they confirm/choose, ask ONCE:
+  "Save this as your default location for future runs?" If yes, persist it (store the path with **forward
+  slashes** — valid on Windows and avoids shell-escaping bugs):
+  ```bash
+  node -e "const fs=require('fs');const p=require('os').homedir()+'/.horizon-scanner/config.json';const c=JSON.parse(fs.readFileSync(p,'utf8'));c.outDir='<CHOSEN_FOLDER_FORWARD_SLASHES>';c.confirmOutDir=true;fs.writeFileSync(p,JSON.stringify(c,null,2));"
+  ```
+  (Set `confirmOutDir:false` instead if the user says to stop asking and just save there every time.)
+
+### Step 9b — Export
+▶ "Exporting to Word and Excel…". Produce the three files in the resolved folder using the descriptive `<base>`:
 
 🔑 **STRIP the citation-fence tags from the prose first.** Before writing any file, remove every inline
 `[workId]` tag from the body prose so a citation reads as **`Author (year)`** alone — the reader never

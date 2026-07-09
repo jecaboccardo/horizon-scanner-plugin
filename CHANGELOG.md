@@ -6,6 +6,10 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.6.7
+- **`horizon.md` Step 9 now proposes ONE save location and confirms before writing — and remembers the user's preference.** Previously the export defaulted to `./horizon-paper-<planId>`, which in a plugin session resolved to a buried temp/scratchpad dir users couldn't find. New behavior: the folder is resolved by precedence — `--out` flag → saved `outDir` preference → default `$HOME/Documents/Horizon Scanner` (never the scratchpad) — and, unless `--out` was passed or the user opted into silent saves, the assistant states the exact target path and gets a quick OK before writing. Filenames are now a descriptive title slug, not `horizon-paper-<planId>`. If no preference is stored yet, it offers to save the chosen folder as the default (`outDir` + `confirmOutDir`) in `~/.horizon-scanner/config.json`.
+- **Credentials step** now also reads `outDir` / `confirmOutDir` from the config so Step 9 can honor the saved location + confirm preference.
+
 ## 0.6.6
 - **Removed the standalone `jel-paper` skill.** It was never invoked by `commands/horizon.md` (which fetches the live writing contract from `/api/generation-spec` itself) and was only reachable as a confusing, non-functional standalone command (`/horizon-scanner:jel-paper` with no evidence set to work from). The writing contract remains fully documented inline in `commands/horizon.md`.
 - **`horizon.md` Step 0 (new):** if no question is given (and no `--plan`), the very first action is now to ask "What's your research question?" — before touching credentials or anything else. Previously this depended on the model noticing the missing argument on its own.
