@@ -15,6 +15,13 @@ app's AI budget.
 
 Flags: `--no-clarify` (skip the questions, use defaults), `--no-expand` (skip planner additions), `--out <path>`.
 
+## Step 0 — No question given? Ask immediately (HARD RULE)
+If `$ARGUMENTS` is empty (and no `--plan <planId>` was given), your VERY FIRST action —
+before touching credentials, before anything else — is to ask: **"What's your research
+question?"** Do not guess a question, do not proceed with a placeholder, and do not run
+any of the steps below until the user replies with one. Once you have a question, continue
+from Credentials below.
+
 ## Credentials — read the saved config first (fall back to env vars)
 ```bash
 CFG="$HOME/.horizon-scanner/config.json"

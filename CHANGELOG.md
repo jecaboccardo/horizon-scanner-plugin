@@ -6,6 +6,11 @@ All notable changes to the Claude Code plugin. Bump `version` in
 retrieval, grounding, the writing contract at `/api/generation-spec`) reach users
 immediately and are NOT listed here — only plugin-file changes are.
 
+## 0.6.6
+- **Removed the standalone `jel-paper` skill.** It was never invoked by `commands/horizon.md` (which fetches the live writing contract from `/api/generation-spec` itself) and was only reachable as a confusing, non-functional standalone command (`/horizon-scanner:jel-paper` with no evidence set to work from). The writing contract remains fully documented inline in `commands/horizon.md`.
+- **`horizon.md` Step 0 (new):** if no question is given (and no `--plan`), the very first action is now to ask "What's your research question?" — before touching credentials or anything else. Previously this depended on the model noticing the missing argument on its own.
+- **`hooks/welcome.mjs` now checks for plugin updates every session** (independent of the existing one-time onboarding tip): compares the installed version against the published version on the standalone repo, throttled to ~once/24h via a local cache, prints a one-line notice only when outdated, silent otherwise or on any failure (offline, etc.). Fixed a Windows-only crash (libuv `UV_HANDLE_CLOSING` assertion) caused by a forced `process.exit()` racing the fetch's internal handles — removed the forced exit, letting the process end naturally.
+
 ## 0.6.5
 - **Generation now matches the web pipeline, not just its writing rules.** The plugin already fetched the shared writing contract (`/api/generation-spec`); this release operationalizes the two pipeline stages it was skipping:
   - **Step 6b — evidence segmentation (Core / Context / Off):** applies the spec's segmentation policy (the plugin analog of the server's topicality tierer) — derive the core topic (strip geography/time/population), tier every paper, build the argument on Core, use Context for framing, never cite Off as core evidence. Adds a `Tier` column to the Excel export and orders rows Core → Context → Off, mirroring the app's evidence table.
